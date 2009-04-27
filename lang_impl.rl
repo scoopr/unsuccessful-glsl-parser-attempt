@@ -84,6 +84,9 @@ void tokenize(void *parser, char *p, char *pe) {
 
     char *eof = pe;
     int cs;
+    char *ts;
+    char *te;
+    int act;
     
     char *begin_token = NULL;
 

@@ -38,6 +38,9 @@ expr(A) ::= expr(B) DIVIDE expr(C).   {
 
 expr(A) ::= INTEGER(B). { exprDebug(INTEGER); A = B; }
 
+expr(A) ::= MINUS expr(C).   { exprDebug(777); A = - C; }
+expr(A) ::= PLUS expr(C).   { exprDebug(777); A =  C; }
+
 expr(A) ::= LPAREN expr(B) RPAREN. { A = B; }
 
 

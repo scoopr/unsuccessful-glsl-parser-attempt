@@ -1,9 +1,10 @@
 %%{
   machine lang;
 
-  integer_value = digit+ > begin_token % INTEGER;
-
   ws = [ \t]+;
+
+  integer_value = ([+\-]? ws? digit+ > begin_token)  % INTEGER;
+
 
   op_plus = "+" % OP_PLUS;
   op_minus = "-" % OP_MINUS;
@@ -17,7 +18,12 @@
   values = integer_value;
 
 
-  main := (values | operators | lparen | rparen | ws)** % done ;
+  main := |*
+    values;
+    operators;
+    lparen | rparen;
+    ws;
+  *|;
 
 }%%
 
