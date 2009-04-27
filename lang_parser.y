@@ -13,17 +13,21 @@
     #include "lang.h"
 
 
-
+    void exprDebug(int t) {
+        printf("expr %d\n", t);
+    }
 
 
 }
 
 program ::= expr(A).   { printf("Result=%%d\n",  A); }
 
-expr(A) ::= expr(B) MINUS  expr(C).   { A = B - C; }
-expr(A) ::= expr(B) PLUS  expr(C).   { A = B + C; }
-expr(A) ::= expr(B) TIMES  expr(C).   { A = B * C; }
-expr(A) ::= expr(B) DIVIDE expr(C).  {
+
+
+expr(A) ::= expr(B) MINUS  expr(C).   { exprDebug(MINUS); A = B - C; }
+expr(A) ::= expr(B) PLUS  expr(C).    { exprDebug(PLUS); A = B + C; }
+expr(A) ::= expr(B) TIMES  expr(C).   { exprDebug(TIMES); A = B * C; }
+expr(A) ::= expr(B) DIVIDE expr(C).   {
 
     if(C != 0) {
         A = B / C;
@@ -32,7 +36,9 @@ expr(A) ::= expr(B) DIVIDE expr(C).  {
     }
 }
 
-expr(A) ::= INTEGER(B). { A = B; }
+expr(A) ::= INTEGER(B). { exprDebug(INTEGER); A = B; }
+
+expr(A) ::= LPAREN expr(B) RPAREN. { A = B; }
 
 
 

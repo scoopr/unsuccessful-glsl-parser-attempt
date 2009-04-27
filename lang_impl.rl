@@ -28,25 +28,32 @@
 
 //            printf("integer token %s.. at %p\n",str, p);
             
-            langparser(parser, INTEGER, strtol(str, NULL, 0));
+            token(parser, INTEGER, strtol(str, NULL, 0));
             begin_token = NULL;        
         }
     }
 
     action OP_PLUS {
-        langparser(parser, PLUS, 0);
+        token(parser, PLUS);
     }
 
     action OP_MINUS {
-        langparser(parser, MINUS, 0);
+        token(parser, MINUS);
     }
     action OP_TIMES {
-        langparser(parser, TIMES, 0);
+        token(parser, TIMES);
     }
     action OP_DIVIDE {
-        langparser(parser, DIVIDE, 0);
+        token(parser, DIVIDE);
     }
     
+    action LPAREN {
+        token(parser, LPAREN);
+    }
+
+    action RPAREN {
+        token(parser, RPAREN);
+    }
 
 
 
@@ -62,7 +69,15 @@
 %% write data;
 
 
+void token(void *parser, int token) {
+    printf("Token %d\n", token);
+    langparser(parser, token, 0);
+}
 
+void token(void *parser, int token, int value) {
+    printf("Token %d (%d)\n", token, value);
+    langparser(parser, token, value);
+}
 
 
 void tokenize(void *parser, char *p, char *pe) {

@@ -1,3 +1,6 @@
 *.o
 test
 lang_impl.cpp
+lang_parser.c
+lang_parser.h
+lang_parser.out
