@@ -1,36 +1,47 @@
 
 #include <iostream>
 
-#include "lang.h"
+#include "glsl.h"
 
 
 
 
 
-void run(char*p, char *pe) {
-
-    void* plangparser = langparserAlloc (malloc);
-
-    tokenize(plangparser, p, pe);
-
-    langparserFree(plangparser, free );
-
-}
 
 
-int main( int argc, char **argv ) 
-{ 
+int main(int argc, char **argv) {
 
     if ( argc > 1 ) { 
 
-        
-        char *p = argv[1]; 
-        char *pe = p + strlen( p );
-        
-        run(p, pe);
+        FILE *f = fopen(argv[1], "r");
+
+        fseek(f, 0, SEEK_END);
+
+        off_t size = ftello(f);
+        fseek(f, 0, SEEK_SET);
+
+
+        char *p = static_cast<char*>(malloc(size));
+        fread(p,size,1,f);
+        char *pe = p + size;
+        fclose(f);
+
+        void* pglslparser = glslparserAlloc (malloc);
+
+        Node *tree = glsl_parse(pglslparser, p, pe, argv[1]);
+
+        if(tree) {
+            tree->dumpTree(std::cout);
+        } else { std::cout << "No tree?" << std::endl; }
+
+        glslparserFree(pglslparser, free );
+
+        free(p);
+
+
     } 
 
 
+    return 0;
+}
 
-    return 0; 
-} 

@@ -15,7 +15,7 @@ LDFLAGS +=
 SRCS = main.cpp
 OBJS = $(SRCS:.cpp=.o) lang_parser.o lang_impl.o 
 
-GLSL_OBJS = glsl_impl.o
+GLSL_OBJS = main.o Token.o glsl_parser.o glsl_impl.o
 
 EXAMPLES = $(wildcard examples/*)
 RESULT_IM = $(EXAMPLES:.frag=.fout)
@@ -54,12 +54,17 @@ $(EXAMPLES): glsl
 test: $(OBJS)
 	$(CXX) $(LDFLAGS) $(OBJS) -o $@
 
-main.o: lang_parser.o
-main.o: lang.h
+main.o: glsl_parser.o
+main.cpp: glsl.h
+Token.cpp: glsl.h
+Node.cpp: glsl.h
+glsl_impl.rl: glsl.h
+glsl_parser.y: glsl.h
+glsl.h: Token.h Node.h
 
 glsl_impl.cpp: glsl_tok.rl
 
-lang_parser.o: CXXFLAGS+=-Wno-unused -Wno-sign-compare
+glsl_parser.o: CXXFLAGS+=-Wno-unused -Wno-sign-compare
 
 clean:
 	$(RM) $(OBJS) $(GLSL_OBJS) glsl_impl.cpp $(TARGET) lang_impl.cpp lang_parser.cpp lang_parser.h lang_parser.out $(RESULT)

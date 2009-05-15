@@ -292,15 +292,15 @@ enum tokens {
     action tok_FLOATCONSTANT {
         if(tok_start) {
             column+=tokenLen(tok_start, p);
-            printToken("float", tok_start, p);
-            tok_start = NULL;            
+            emitToken(tc, GLSL_FLOATCONSTANT, tok_start, p);
+            tok_start = NULL;
         }
     }
 
     action tok_INTCONSTANT {
         if(tok_start) {
             column+=tokenLen(tok_start, p);
-            printToken("int", tok_start, p);
+            emitToken(tc, GLSL_INTCONSTANT, tok_start, p);
             tok_start = NULL;
         }
     }
@@ -308,7 +308,7 @@ enum tokens {
     action tok_UINTCONSTANT {
         if(tok_start) {
             column+=tokenLen(tok_start, p);
-            printToken("uint", tok_start, p);
+            emitToken(tc, GLSL_UINTCONSTANT, tok_start, p);
             tok_start = NULL;
         }
     }
@@ -316,7 +316,7 @@ enum tokens {
     action tok_IDENTIFIER {
         if(tok_start) {
             column+=tokenLen(tok_start, p);
-            printToken("identifier", tok_start, p);
+            emitToken(tc, GLSL_IDENTIFIER, tok_start, p);
             tok_start = NULL;
         }
     }
@@ -324,7 +324,7 @@ enum tokens {
     action tok_KEYWORD {
         if(tok_start) {
             column+=tokenLen(tok_start, p);
-            printToken("keyword",tok_start, p);
+            emitToken(tc, GLSL_NA, tok_start, p);
             tok_start = NULL;
         }
     }
@@ -332,22 +332,22 @@ enum tokens {
     action tok_OPERATOR {
         if(tok_start) {
             column+=tokenLen(tok_start, p);
-            printToken("operator", tok_start, p);
+            emitToken(tc, GLSL_NA, tok_start, p);
             tok_start = NULL;
         }
     }
 
     action column {
-        column+=1;
+        tc.column+=1;
     }
     
     action tab_column {
-        column+=4; // huh?
+        tc.column+=4; // huh?
     }
     
     action line {
-        column=1;
-        line+=1;
+        tc.column=1;
+        tc.line+=1;
     }
 
     include glsl "glsl_tok.rl";
@@ -357,36 +357,60 @@ enum tokens {
 
 }%%
 
+#define GLSL_NA 999
 
 #include <stdio.h>
 #include <stdlib.h>
+
+#include "glsl.h"
+
+#include <iostream>
+#include <string>
+
+class TokenizerContext {
+public:
+    TokenizerContext() : line(1), column(1), parser(NULL) {}
+    std::string filename;
+    int line;
+    int column;
+    void *parser;
+};
+
 
 
 size_t tokenLen(char *p, char *pe) {
     return pe+1 - p;
 }
 
-void printToken(char *type, char *p, char *pe) {
+void emitToken(TokenizerContext& tc, int id, char *p, char *pe) {
+
+    glslparser(tc.parser, id, new Token(id, std::string(p, tokenLen(p, pe)), tc.filename, tc.line, tc.column));
+}
+
+
+void printToken(char * , char * , char * ) {
 //    printf("%s value: '", type);
-    while(p != pe+1) {
+//    while(p != pe+1) {
 //        fputc(*p, stdout);
-        ++p;
-    }
+//        ++p;
+//    }
+
 //    printf("'\n");
 }
 
-void token(void*, int t) {
+void token(void*, int ) {
 //    printf("Token %d\n", t);
 }
 
 
 
 %% write data;
+extern Node* result;
 
-void glsl_parse(char *p, char *pe) {
+Node* glsl_parse(void* parser, char *p, char *pe, const std::string& filename) {
     int column = 1, line =1;
     int cs;
-    char *begin = p;
+//    char *begin = p;
 
     char *ts;
     char *te;
@@ -394,9 +418,13 @@ void glsl_parse(char *p, char *pe) {
 
     char *eof = pe;
 
-    void *parser = NULL;
+
     char *tok_start = NULL;
 
+    TokenizerContext tc;
+    tc.filename = filename;
+    tc.parser = parser;
+    
     %% write init;
     %% write exec;
 
@@ -408,35 +436,8 @@ void glsl_parse(char *p, char *pe) {
         printf("stopped at %d, %d\n", line, column );
     }
 
+    return result;
 }
 
 
-
-int main(int argc, char **argv) {
-    
-    if ( argc > 1 ) { 
-
-        
-        FILE *f = fopen(argv[1], "r");
-
-        fseek(f, 0, SEEK_END);
-        
-        off_t size = ftello(f);
-        fseek(f, 0, SEEK_SET);
-
-
-        char *p = static_cast<char*>(malloc(size));
-        fread(p,size,1,f);
-        char *pe = p + size;
-        fclose(f);
-        
-        glsl_parse(p, pe);
-        free(p);
-
-
-    } 
-
-    
-    return 0;
-}
 
