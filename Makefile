@@ -67,5 +67,5 @@ glsl_impl.cpp: glsl_tok.rl
 glsl_parser.o: CXXFLAGS+=-Wno-unused -Wno-sign-compare
 
 clean:
-	$(RM) $(OBJS) $(GLSL_OBJS) glsl_impl.cpp $(TARGET) lang_impl.cpp lang_parser.cpp lang_parser.h lang_parser.out $(RESULT)
+	$(RM) $(OBJS) $(GLSL_OBJS) glsl_impl.cpp glsl $(TARGET) lang_impl.cpp glsl_parser.cpp glsl_parser.h glsl_parser.out $(RESULT)
 
