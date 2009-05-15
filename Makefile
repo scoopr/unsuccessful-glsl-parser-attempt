@@ -12,10 +12,9 @@ TARGET=glsl_examples
 CXXFLAGS += -Wall -Wextra 
 LDFLAGS +=
 
-SRCS = main.cpp
-OBJS = $(SRCS:.cpp=.o) lang_parser.o lang_impl.o 
+SRCS = main.cpp Token.cpp
+OBJS = $(SRCS:.cpp=.o) glsl_impl.o glsl_parser.o
 
-GLSL_OBJS = main.o Token.o glsl_parser.o glsl_impl.o
 
 EXAMPLES = $(wildcard examples/*)
 RESULT_IM = $(EXAMPLES:.frag=.fout)
@@ -39,8 +38,8 @@ all: $(TARGET)
 	@$(RAGEL) -C $< -o $@
 
 
-glsl: $(GLSL_OBJS)
-	$(CXX) $(LDFLAGS) $(GLSL_OBJS) -o $@
+glsl: $(OBJS)
+	$(CXX) $(LDFLAGS) $(OBJS) -o $@
 
 .y.cpp:
 	@echo GEN PARSER $<
@@ -51,8 +50,6 @@ glsl_examples: glsl $(RESULT)
 
 $(EXAMPLES): glsl
 
-test: $(OBJS)
-	$(CXX) $(LDFLAGS) $(OBJS) -o $@
 
 main.o: glsl_parser.o
 main.cpp: glsl.h
@@ -67,5 +64,5 @@ glsl_impl.cpp: glsl_tok.rl
 glsl_parser.o: CXXFLAGS+=-Wno-unused -Wno-sign-compare
 
 clean:
-	$(RM) $(OBJS) $(GLSL_OBJS) glsl_impl.cpp glsl $(TARGET) lang_impl.cpp glsl_parser.cpp glsl_parser.h glsl_parser.out $(RESULT)
+	$(RM) $(OBJS) $(GLSL_OBJS) glsl_impl.cpp glsl $(TARGET)  glsl_parser.cpp glsl_parser.h glsl_parser.out $(RESULT)
 
