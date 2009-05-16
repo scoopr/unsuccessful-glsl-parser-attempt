@@ -251,7 +251,7 @@ public:
         if(tok_start) {
             TokenizerContext& tc = *this;
             Token *t = new Token(id, std::string(tok_start, tokenLen()), tc.filename, tc.line, tc.column);
-            std::cout << "Token accepted : " << *t << std::endl;
+//            std::cout << "Token accepted : " << *t << std::endl;
             glslparser(tc.parser, id, t);
             column += tokenLen();
             tok_start = NULL;
@@ -279,7 +279,7 @@ public:
         tc.filename = filename;
         tc.parser = parser;
 
-        glslparserTrace(stdout, "-> ");
+//        glslparserTrace(stdout, "-> ");
 
         %% write init;
         %% write exec;

@@ -46,8 +46,7 @@ glsl: $(OBJS)
 	$(LEMON) $<
 	mv $(subst .y,.c,$<) $@
 
-glsl_examples: glsl 
-	./glsl examples/ary.vert
+glsl_examples: glsl $(RESULT)
 
 $(EXAMPLES): glsl
 
