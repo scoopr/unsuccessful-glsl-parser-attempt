@@ -15,6 +15,7 @@ void glslparser(
                  /* Optional %extra_argument parameter */
   );
 
+void glslparserTrace(FILE *TraceFILE, char *zTracePrompt);
 
 class Node;
 

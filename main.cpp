@@ -1,5 +1,6 @@
 
 #include <iostream>
+#include <stdexcept>
 
 #include "glsl.h"
 
@@ -14,7 +15,7 @@ int main(int argc, char **argv) {
     if ( argc > 1 ) { 
 
         FILE *f = fopen(argv[1], "r");
-
+        if(!f) { throw std::runtime_error("Could not open file"); }
         fseek(f, 0, SEEK_END);
 
         off_t size = ftello(f);

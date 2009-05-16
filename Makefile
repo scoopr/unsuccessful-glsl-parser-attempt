@@ -46,17 +46,18 @@ glsl: $(OBJS)
 	$(LEMON) $<
 	mv $(subst .y,.c,$<) $@
 
-glsl_examples: glsl $(RESULT)
+glsl_examples: glsl 
+	./glsl examples/ary.vert
 
 $(EXAMPLES): glsl
 
 
 main.o: glsl_parser.o
-main.cpp: glsl.h
-Token.cpp: glsl.h
-Node.cpp: glsl.h
-glsl_impl.rl: glsl.h
-glsl_parser.y: glsl.h
+main.o: glsl.h Node.h Token.h
+Token.o: glsl.h Node.h Token.h
+Node.o: glsl.h Node.h Token.h
+glsl_impl.o: glsl.h Node.h Token.h
+glsl_parser.o: glsl.h Node.h Token.h
 glsl.h: Token.h Node.h
 
 glsl_impl.cpp: glsl_tok.rl

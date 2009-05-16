@@ -5,6 +5,8 @@
 %token_prefix GLSL_
 %name glslparser
 
+%type unary_operator {Token*}
+%type assignment_operator {Token*}
 
 /*
 Precedence Operator Class Operators Associativity 
@@ -63,8 +65,9 @@ Right to Left
 
 
 %syntax_error {
+    syntax_error = true;
 //    throw std::runtime_error("Syntax terror!")
-    std::cout << "Syntax error!" << std::endl;
+    std::cout << "Syntax error on token: " << *TOKEN << std::endl;
 }
 
 
@@ -81,7 +84,7 @@ Right to Left
     #include "glsl.h"
     #include "Node.h"
 
-
+    bool syntax_error = false;
     Node *result = NULL;
 
 }
@@ -100,144 +103,146 @@ primary_expression(A) ::= UINTCONSTANT(B). { A = new Node(B); }
 primary_expression(A) ::= LEFT_PAREN expression(B) RIGHT_PAREN. { A = new Node(B); }
 
 
-postfix_expression ::= primary_expression .
-postfix_expression ::= postfix_expression LEFT_BRACKET integer_expression RIGHT_BRACKET .
-postfix_expression ::= function_call .
-postfix_expression ::= postfix_expression DOT FIELD_SELECTION .
-postfix_expression ::= postfix_expression INC_OP .
-postfix_expression ::= postfix_expression DEC_OP .
+postfix_expression(A) ::= primary_expression(B) . { A = B; }
+postfix_expression(A) ::= postfix_expression(B) LEFT_BRACKET integer_expression(C) RIGHT_BRACKET . { A = new Node(B,C); }
+postfix_expression(A) ::= function_call(B) . { A = B; }
+postfix_expression(A) ::= postfix_expression(B) DOT IDENTIFIER(C) . { A = new Node(B,new IdentifierNode(C)); }
+//postfix_expression ::= postfix_expression DOT FIELD_SELECTION .
+postfix_expression(A) ::= postfix_expression(B) INC_OP . { A = B; }
+postfix_expression(A) ::= postfix_expression(B) DEC_OP . { A = B; }
 
 
 integer_expression(A) ::= expression(B). { A = B; }
 
-function_call ::= function_call_or_method .
-function_call_or_method ::= function_call_generic .
-function_call_or_method ::= postfix_expression DOT function_call_generic .
+function_call(A) ::= function_call_or_method(B) . { A = B; }
+function_call_or_method(A) ::= function_call_generic(B) . { A = B; }
+function_call_or_method(A) ::= postfix_expression(B) DOT function_call_generic(C) .{ A = new Node(B,C); }
 
-function_call_generic ::= function_call_header_with_parameters RIGHT_PAREN .
-function_call_generic ::= function_call_header_no_parameters RIGHT_PAREN .
+function_call_generic(A) ::= function_call_header_with_parameters(B) RIGHT_PAREN . { A = B; }
+function_call_generic(A) ::= function_call_header_no_parameters(B) RIGHT_PAREN .   { A = B; }
 
-function_call_header_no_parameters ::= function_call_header VOID .
-function_call_header_no_parameters ::= function_call_header .
+function_call_header_no_parameters(A) ::= function_call_header(B) VOID . { A = B; }
+function_call_header_no_parameters(A) ::= function_call_header(B) .      { A = B; }
 
-function_call_header_with_parameters ::= function_call_header assignment_expression .
-function_call_header_with_parameters ::= function_call_header_with_parameters COMMA assignment_expression .
+function_call_header_with_parameters(A) ::= function_call_header(B) assignment_expression(C) . { A = new Node(B,C); }
+function_call_header_with_parameters(A) ::= function_call_header_with_parameters(B) COMMA assignment_expression(C) . { A = B; A->addChild(C); }
 
-function_call_header ::= function_identifier LEFT_PAREN .
+function_call_header(A) ::= function_identifier(B) LEFT_PAREN . { A = B; }
 
-function_identifier ::= type_specifier .
-function_identifier ::= IDENTIFIER .
-function_identifier ::= FIELD_SELECTION .
-
-
-unary_expression ::= postfix_expression.
-unary_expression ::= INC_OP unary_expression . [UNARY]
-unary_expression ::= DEC_OP unary_expression . [UNARY]
-unary_expression ::= unary_operator unary_expression . [UNARY]
+function_identifier(A) ::= type_specifier(B) .  { A = B; }
+function_identifier(A) ::= IDENTIFIER(B) .      { A  = new IdentifierNode(B); }
+// function_identifier ::= FIELD_SELECTION .
 
 
-unary_operator ::= PLUS . [UNARY]
-unary_operator ::= DASH . [UNARY]
-unary_operator ::= BANG . [UNARY]
-unary_operator ::= TILDE . [UNARY]
+unary_expression(A) ::= postfix_expression(B).  { A = B; }
+unary_expression(A) ::= INC_OP unary_expression(B) . [UNARY]  { A = new Node(B); }
+unary_expression(A) ::= DEC_OP unary_expression(B) . [UNARY]  { A = new Node(B); }
+unary_expression(A) ::= unary_operator(B) unary_expression(C) . [UNARY] { A = new Node(new Node(B),C); }
 
 
-multiplicative_expression ::= unary_expression .
-multiplicative_expression ::= multiplicative_expression STAR unary_expression .
-multiplicative_expression ::= multiplicative_expression SLASH unary_expression .
-multiplicative_expression ::= multiplicative_expression PERCENT unary_expression .
+unary_operator(A) ::= PLUS(B) . [UNARY]  { A = B; }
+unary_operator(A) ::= DASH(B) . [UNARY]  { A = B; }
+unary_operator(A) ::= BANG(B) . [UNARY]  { A = B; }
+unary_operator(A) ::= TILDE(B) . [UNARY] { A = B; }
 
 
-additive_expression ::= multiplicative_expression .
-additive_expression ::= additive_expression PLUS multiplicative_expression .
-additive_expression ::= additive_expression DASH multiplicative_expression .
+multiplicative_expression(A) ::= unary_expression(B) . { A = B; }
+multiplicative_expression(A) ::= multiplicative_expression(B) STAR unary_expression(C) . { A = new MultiplicationNode(B,C); }
+multiplicative_expression(A) ::= multiplicative_expression(B) SLASH unary_expression(C) .  { A = new Node(B,C); }
+multiplicative_expression(A) ::= multiplicative_expression(B) PERCENT unary_expression(C) .{ A = new Node(B,C); }
 
 
-shift_expression ::= additive_expression .
-shift_expression ::= shift_expression LEFT_OP additive_expression .
-shift_expression ::= shift_expression RIGHT_OP additive_expression .
+additive_expression(A) ::= multiplicative_expression(B) . { A = B; }
+additive_expression(A) ::= additive_expression(B) PLUS multiplicative_expression(C) . { A = new AdditionNode(B,C); }
+additive_expression(A) ::= additive_expression(B) DASH multiplicative_expression(C) . { A = new Node(B,C); }
 
 
-relational_expression ::= shift_expression .
-relational_expression ::= relational_expression LEFT_ANGLE shift_expression .
-relational_expression ::= relational_expression RIGHT_ANGLE shift_expression .
-relational_expression ::= relational_expression LE_OP shift_expression .
-relational_expression ::= relational_expression GE_OP shift_expression .
+shift_expression(A) ::= additive_expression(B) . { A = B; }
+shift_expression(A) ::= shift_expression LEFT_OP additive_expression .
+shift_expression(A) ::= shift_expression RIGHT_OP additive_expression .
 
 
-equality_expression ::= relational_expression .
-equality_expression ::= equality_expression EQ_OP relational_expression .
-equality_expression ::= equality_expression NE_OP relational_expression .
-
-and_expression ::= equality_expression .
-and_expression ::= and_expression AMPERSAND equality_expression.
-
-exclusive_or_expression ::= and_expression .
-exclusive_or_expression ::= exclusive_or_expression CARET and_expression .
-
-inclusive_or_expression ::= exclusive_or_expression .
-inclusive_or_expression ::= inclusive_or_expression VERTICAL_BAR exclusive_or_expression .
-
-logical_and_expression ::= inclusive_or_expression .
-logical_and_expression ::= logical_and_expression AND_OP inclusive_or_expression .
-
-logical_xor_expression ::= logical_and_expression .
-logical_xor_expression ::= logical_xor_expression XOR_OP logical_and_expression .
-
-logical_or_expression ::= logical_xor_expression .
-logical_or_expression ::= logical_or_expression OR_OP logical_xor_expression .
+relational_expression(A) ::= shift_expression(B) . { A = B; }
+relational_expression(A) ::= relational_expression LEFT_ANGLE shift_expression .
+relational_expression(A) ::= relational_expression RIGHT_ANGLE shift_expression .
+relational_expression(A) ::= relational_expression LE_OP shift_expression .
+relational_expression(A) ::= relational_expression GE_OP shift_expression .
 
 
-conditional_expression ::= logical_or_expression .
-conditional_expression ::= logical_or_expression QUESTION expression COLON assignment_expression .
+equality_expression(A) ::= relational_expression(B) . { A = B; }
+equality_expression(A) ::= equality_expression EQ_OP relational_expression .
+equality_expression(A) ::= equality_expression NE_OP relational_expression .
+
+and_expression(A) ::= equality_expression(B) . { A = B; }
+and_expression(A) ::= and_expression AMPERSAND equality_expression.
+
+exclusive_or_expression(A) ::= and_expression(B) . { A = B; }
+exclusive_or_expression(A) ::= exclusive_or_expression CARET and_expression .
+
+inclusive_or_expression(A) ::= exclusive_or_expression(B) . { A = B; }
+inclusive_or_expression(A) ::= inclusive_or_expression VERTICAL_BAR exclusive_or_expression .
+
+logical_and_expression(A) ::= inclusive_or_expression(B) . { A = B; }
+logical_and_expression(A) ::= logical_and_expression AND_OP inclusive_or_expression .
+
+logical_xor_expression(A) ::= logical_and_expression(B) . { A = B; }
+logical_xor_expression(A) ::= logical_xor_expression XOR_OP logical_and_expression .
+
+logical_or_expression(A) ::= logical_xor_expression(B) . { A = B; }
+logical_or_expression(A) ::= logical_or_expression OR_OP logical_xor_expression .
 
 
-
-assignment_expression ::= conditional_expression. 
-assignment_expression ::= unary_expression assignment_operator assignment_expression.
+conditional_expression(A) ::= logical_or_expression(B) . { A = B; }
+conditional_expression(A) ::= logical_or_expression(B) QUESTION expression(C) COLON assignment_expression(D) . { A = new Node(B,C,D); }
 
 
 
-
-assignment_operator(A) ::= EQUAL(B). { A = new Node(B); }
-assignment_operator(A) ::= MUL_ASSIGN(B). { A = new Node(B); }
-assignment_operator(A) ::= DIV_ASSIGN(B). { A = new Node(B); }
-assignment_operator(A) ::= MOD_ASSIGN(B). { A = new Node(B); }
-assignment_operator(A) ::= ADD_ASSIGN(B). { A = new Node(B); }
-assignment_operator(A) ::= SUB_ASSIGN(B). { A = new Node(B); }
-assignment_operator(A) ::= LEFT_ASSIGN(B). { A = new Node(B); }
-assignment_operator(A) ::= RIGHT_ASSIGN(B). { A = new Node(B); }
-assignment_operator(A) ::= AND_ASSIGN(B). { A = new Node(B); }
-assignment_operator(A) ::= XOR_ASSIGN(B). { A = new Node(B); }
-assignment_operator(A) ::= OR_ASSIGN(B). { A = new Node(B); }
+assignment_expression(A) ::= conditional_expression(B). { A = B; } 
+assignment_expression(A) ::= unary_expression(B) assignment_operator(C) assignment_expression(D). { A = new AssignNode(B,D,C); }
 
 
 
-expression(A) ::= assignment_expression(B). { A = new Node(B); }
-expression(A) ::= expression(B) COMMA assignment_expression(C). { A = new Node(new Node(B),C); }
+
+assignment_operator(A) ::= EQUAL(B).        { A = B; }
+assignment_operator(A) ::= MUL_ASSIGN(B).   { A = B; }
+assignment_operator(A) ::= DIV_ASSIGN(B).   { A = B; }
+assignment_operator(A) ::= MOD_ASSIGN(B).   { A = B; }
+assignment_operator(A) ::= ADD_ASSIGN(B).   { A = B; }
+assignment_operator(A) ::= SUB_ASSIGN(B).   { A = B; }
+assignment_operator(A) ::= LEFT_ASSIGN(B).  { A = B; }
+assignment_operator(A) ::= RIGHT_ASSIGN(B). { A = B; }
+assignment_operator(A) ::= AND_ASSIGN(B).   { A = B; }
+assignment_operator(A) ::= XOR_ASSIGN(B).   { A = B; }
+assignment_operator(A) ::= OR_ASSIGN(B).    { A = B; }
 
 
-constant_expression ::= conditional_expression.
 
-declaration ::= function_prototype SEMICOLON. 
-declaration ::= init_declarator_list SEMICOLON .
-declaration ::= PRECISION precision_qualifier type_specifier_no_prec SEMICOLON .
-declaration ::= type_qualifier IDENTIFIER LEFT_BRACE struct_declaration_list RIGHT_BRACE SEMICOLON .
-declaration ::= type_qualifier SEMICOLON .
+expression(A) ::= assignment_expression(B). { A = B; }
+expression(A) ::= expression(B) COMMA assignment_expression(C). { A = B; B->addChild(C); }
 
-function_prototype ::= function_declarator RIGHT_PAREN. 
 
-function_declarator ::= function_header .
-function_declarator ::= function_header_with_parameters .
+constant_expression(A) ::= conditional_expression(B). { A = B; }
 
-function_header_with_parameters ::= function_header parameter_declaration.
-function_header_with_parameters ::= function_header_with_parameters COMMA parameter_declaration.
+declaration(A) ::= function_prototype(B) SEMICOLON. { A = B; }
+declaration(A) ::= init_declarator_list(B) SEMICOLON .{ A = B; }
+// declaration ::= PRECISION precision_qualifier type_specifier_no_prec SEMICOLON .
+// declaration ::= type_qualifier IDENTIFIER LEFT_BRACE struct_declaration_list RIGHT_BRACE SEMICOLON .
+// declaration ::= type_qualifier SEMICOLON .
 
+function_prototype(A) ::= function_declarator(B) RIGHT_PAREN. { A = B; }
+
+function_declarator(A) ::= function_header(B) . { A = B; }
+function_declarator(A) ::= function_header_with_parameters(B) . { A = B; }
+
+function_header_with_parameters(A) ::= function_header(B) parameter_declaration(C). { A = new Node(B,C); }
+function_header_with_parameters(A) ::= function_header_with_parameters(B) COMMA parameter_declaration(C). { A = B; B->addChild(C); }
+
+//function_header(A) ::= fully_specified_type(B) IDENTIFIER(C) LEFT_PAREN. { A = new Node(B,C); }
 function_header(A) ::= fully_specified_type(B) IDENTIFIER(C) LEFT_PAREN. { A = new Node(B,new IdentifierNode(C)); }
 
 
-parameter_declarator ::= type_specifier IDENTIFIER.
-parameter_declarator ::= type_specifier IDENTIFIER LEFT_BRACKET constant_expression RIGHT_BRACKET.
+parameter_declarator(A) ::= type_specifier(B) IDENTIFIER(C). { A = new Node(B, new IdentifierNode(C)); }
+parameter_declarator(A) ::= type_specifier(B) IDENTIFIER(C) LEFT_BRACKET constant_expression(D) RIGHT_BRACKET. { A = new Node(B, new IdentifierNode(C), D); }
 
 parameter_declaration(A) ::= parameter_type_qualifier(B) parameter_qualifier(C) parameter_declarator(D). { A = new ParameterDeclarationNode(B,C,D); }
 parameter_declaration(A) ::= parameter_qualifier(B) parameter_declarator(C) . { A = new ParameterDeclarationNode(B,C); }
@@ -245,37 +250,37 @@ parameter_declaration(A) ::= parameter_type_qualifier(B) parameter_qualifier(C) 
 parameter_declaration(A) ::= parameter_qualifier(B) parameter_type_specifier(C) . { A = new ParameterDeclarationNode(B,C); }
 
 parameter_qualifier(A) ::=. { A = new Node(); }
-parameter_qualifier(A) ::= IN . { A = new Node(); }
-parameter_qualifier(A) ::= OUT . { A = new Node(); }
-parameter_qualifier(A) ::= INOUT . { A = new Node(); }
+parameter_qualifier(A) ::= IN(B) . { A = new Node(B); }
+parameter_qualifier(A) ::= OUT(B) . { A = new Node(B); }
+parameter_qualifier(A) ::= INOUT(B) . { A = new Node(B); }
 
 
-parameter_type_specifier ::= type_specifier .
-
-
-
-init_declarator_list ::= single_declaration .
-init_declarator_list ::= init_declarator_list COMMA IDENTIFIER .
-init_declarator_list ::= init_declarator_list COMMA IDENTIFIER LEFT_BRACKET  RIGHT_BRACKET .
-init_declarator_list ::= init_declarator_list COMMA IDENTIFIER LEFT_BRACKET constant_expression RIGHT_BRACKET .
-init_declarator_list ::= init_declarator_list COMMA IDENTIFIER LEFT_BRACKET RIGHT_BRACKET EQUAL initializer .
-init_declarator_list ::= init_declarator_list COMMA IDENTIFIER LEFT_BRACKET constant_expression RIGHT_BRACKET EQUAL initializer .
-init_declarator_list ::= init_declarator_list COMMA IDENTIFIER EQUAL initializer .
+parameter_type_specifier(A) ::= type_specifier(B) . { A = B; }
 
 
 
-single_declaration ::= fully_specified_type .
-single_declaration ::= fully_specified_type IDENTIFIER .
-single_declaration ::= fully_specified_type IDENTIFIER LEFT_BRACKET  RIGHT_BRACKET .
-single_declaration ::= fully_specified_type IDENTIFIER LEFT_BRACKET constant_expression RIGHT_BRACKET .
-single_declaration ::= fully_specified_type IDENTIFIER LEFT_BRACKET RIGHT_BRACKET EQUAL initializer .
-single_declaration ::= fully_specified_type IDENTIFIER LEFT_BRACKET constant_expression RIGHT_BRACKET EQUAL initializer .
-single_declaration ::= fully_specified_type IDENTIFIER EQUAL initializer .
-single_declaration ::= INVARIANT IDENTIFIER .  // Vertex only. 
+init_declarator_list(A) ::= single_declaration(B) . { A = B; }
+init_declarator_list(A) ::= init_declarator_list COMMA IDENTIFIER .
+init_declarator_list(A) ::= init_declarator_list COMMA IDENTIFIER LEFT_BRACKET  RIGHT_BRACKET .
+init_declarator_list(A) ::= init_declarator_list COMMA IDENTIFIER LEFT_BRACKET constant_expression RIGHT_BRACKET .
+init_declarator_list(A) ::= init_declarator_list COMMA IDENTIFIER LEFT_BRACKET RIGHT_BRACKET EQUAL initializer .
+init_declarator_list(A) ::= init_declarator_list COMMA IDENTIFIER LEFT_BRACKET constant_expression RIGHT_BRACKET EQUAL initializer .
+init_declarator_list(A) ::= init_declarator_list COMMA IDENTIFIER EQUAL initializer .
 
 
-fully_specified_type ::= type_specifier .
-fully_specified_type ::= type_qualifier type_specifier .
+
+single_declaration(A) ::= fully_specified_type(B) . { A = B; }
+single_declaration(A) ::= fully_specified_type(B) IDENTIFIER(C) . { A = new Node(B, new IdentifierNode(C)); }
+single_declaration(A) ::= fully_specified_type(B) IDENTIFIER(C) LEFT_BRACKET  RIGHT_BRACKET . { A = new Node(B, new IdentifierNode(C)); }
+single_declaration(A) ::= fully_specified_type(B) IDENTIFIER(C) LEFT_BRACKET constant_expression(D) RIGHT_BRACKET . { A = new Node(B, new IdentifierNode(C), D); }
+single_declaration(A) ::= fully_specified_type(B) IDENTIFIER(C) LEFT_BRACKET RIGHT_BRACKET EQUAL initializer(D) . { A = new Node(B, new IdentifierNode(C) ,D); }
+single_declaration(A) ::= fully_specified_type(B) IDENTIFIER(C) LEFT_BRACKET constant_expression(D) RIGHT_BRACKET EQUAL initializer(E) . { A = new Node(B, new IdentifierNode(C), D ,E); }
+single_declaration(A) ::= fully_specified_type(B) IDENTIFIER(C) EQUAL initializer(D) . { A = new Node(B, new IdentifierNode(C),D); }
+single_declaration(A) ::= INVARIANT IDENTIFIER .  // Vertex only. 
+
+
+fully_specified_type(A) ::= type_specifier(B) . { A = B; }
+fully_specified_type(A) ::= type_qualifier(B) type_specifier(C) . { A = new Node(B,C); }
 
 
 invariant_qualifier ::= INVARIANT .
@@ -294,11 +299,11 @@ parameter_type_qualifier ::= CONST .
 
 
 
-type_qualifier ::= storage_qualifier .
-type_qualifier ::= layout_qualifier. 
-type_qualifier ::= layout_qualifier storage_qualifier .
-type_qualifier ::= interpolation_qualifier type_qualifier .
-type_qualifier ::= invariant_qualifier type_qualifier .
+type_qualifier(A) ::= storage_qualifier(B) . { A = B; }
+type_qualifier(A) ::= layout_qualifier(B).  { A = B; }
+type_qualifier(A) ::= layout_qualifier storage_qualifier(B). { A = B; }
+type_qualifier(A) ::= interpolation_qualifier type_qualifier(B) . { A = B; }
+type_qualifier(A) ::= invariant_qualifier type_qualifier(B) . { A = B; }
 //type_qualifier ::= invariant_qualifier interpolation_qualifier type_qualifier . // Cannot be reduced?
 
 
@@ -314,74 +319,74 @@ storage_qualifier ::= UNIFORM .
 
 
 
-type_specifier ::= type_specifier_no_prec. 
-type_specifier ::= precision_qualifier type_specifier_no_prec.
+type_specifier(A) ::= type_specifier_no_prec(B). { A = B; } 
+type_specifier(A) ::= precision_qualifier(B) type_specifier_no_prec(C). { A = new Node(B,C); }
 
 
-type_specifier_no_prec ::= type_specifier_nonarray .
-type_specifier_no_prec ::= type_specifier_nonarray LEFT_BRACKET RIGHT_BRACKET .
-type_specifier_no_prec ::= type_specifier_nonarray LEFT_BRACKET constant_expression RIGHT_BRACKET .
+type_specifier_no_prec(A) ::= type_specifier_nonarray(B) . { A = B; }
+type_specifier_no_prec(A) ::= type_specifier_nonarray(B) LEFT_BRACKET RIGHT_BRACKET . { A = B; }
+type_specifier_no_prec(A) ::= type_specifier_nonarray(B) LEFT_BRACKET constant_expression(C) RIGHT_BRACKET . { A = new Node(B,C); }
 
 
-type_specifier_nonarray ::= VOID .
-type_specifier_nonarray ::= FLOAT .
-type_specifier_nonarray ::= INT .
-type_specifier_nonarray ::= UINT .
-type_specifier_nonarray ::= BOOL .
-type_specifier_nonarray ::= VEC2 .
-type_specifier_nonarray ::= VEC3 .
-type_specifier_nonarray ::= VEC4 .
-type_specifier_nonarray ::= BVEC2 .
-type_specifier_nonarray ::= BVEC3 .
-type_specifier_nonarray ::= BVEC4 .
-type_specifier_nonarray ::= IVEC2 .
-type_specifier_nonarray ::= IVEC3 .
-type_specifier_nonarray ::= IVEC4 .
-type_specifier_nonarray ::= UVEC2 .
-type_specifier_nonarray ::= UVEC3 .
-type_specifier_nonarray ::= UVEC4 .
-type_specifier_nonarray ::= MAT2 .
-type_specifier_nonarray ::= MAT3 .
-type_specifier_nonarray ::= MAT4 .
-type_specifier_nonarray ::= MAT2X2. 
-type_specifier_nonarray ::= MAT2X3 .
-type_specifier_nonarray ::= MAT2X4 .
-type_specifier_nonarray ::= MAT3X2 .
-type_specifier_nonarray ::= MAT3X3 .
-type_specifier_nonarray ::= MAT3X4 .
-type_specifier_nonarray ::= MAT4X2 .
-type_specifier_nonarray ::= MAT4X3 .
-type_specifier_nonarray ::= MAT4X4 .
-type_specifier_nonarray ::= SAMPLER1D .
-type_specifier_nonarray ::= SAMPLER2D .
-type_specifier_nonarray ::= SAMPLER3D .
-type_specifier_nonarray ::= SAMPLERCUBE .
-type_specifier_nonarray ::= SAMPLER1DSHADOW .
-type_specifier_nonarray ::= SAMPLER2DSHADOW .
-type_specifier_nonarray ::= SAMPLERCUBESHADOW. 
-type_specifier_nonarray ::= SAMPLER1DARRAY .
-type_specifier_nonarray ::= SAMPLER2DARRAY .
-type_specifier_nonarray ::= SAMPLER1DARRAYSHADOW .
-type_specifier_nonarray ::= SAMPLER2DARRAYSHADOW .
-//type_specifier_nonarray ::= SAMPLERCUBESHADOW .
-//type_specifier_nonarray ::= SAMPLER1DARRAY .
-//type_specifier_nonarray ::= SAMPLER2DARRAY .
-//type_specifier_nonarray ::= SAMPLER1DARRAYSHADOW .
-//type_specifier_nonarray ::= SAMPLER2DARRAYSHADOW .
-type_specifier_nonarray ::= ISAMPLER1D .
-type_specifier_nonarray ::= ISAMPLER2D .
-type_specifier_nonarray ::= ISAMPLER3D .
-type_specifier_nonarray ::= ISAMPLERCUBE. 
-type_specifier_nonarray ::= ISAMPLER1DARRAY .
-type_specifier_nonarray ::= ISAMPLER2DARRAY .
-type_specifier_nonarray ::= USAMPLER1D .
-type_specifier_nonarray ::= USAMPLER2D .
-type_specifier_nonarray ::= USAMPLER3D .
-type_specifier_nonarray ::= USAMPLERCUBE. 
-type_specifier_nonarray ::= USAMPLER1DARRAY. 
-type_specifier_nonarray ::= USAMPLER2DARRAY .
-type_specifier_nonarray ::= struct_specifier .
-type_specifier_nonarray ::= TYPE_NAME .
+type_specifier_nonarray(A) ::= VOID(B).                               { A = new TypeNode(B); }
+type_specifier_nonarray(A) ::= FLOAT(B).                              { A = new TypeNode(B); }
+type_specifier_nonarray(A) ::= INT(B).                                { A = new TypeNode(B); }
+type_specifier_nonarray(A) ::= UINT(B).                               { A = new TypeNode(B); }
+type_specifier_nonarray(A) ::= BOOL(B).                               { A = new TypeNode(B); }
+type_specifier_nonarray(A) ::= VEC2(B).                               { A = new TypeNode(B); }
+type_specifier_nonarray(A) ::= VEC3(B).                               { A = new TypeNode(B); }
+type_specifier_nonarray(A) ::= VEC4(B).                               { A = new TypeNode(B); }
+type_specifier_nonarray(A) ::= BVEC2(B).                              { A = new TypeNode(B); }
+type_specifier_nonarray(A) ::= BVEC3(B).                              { A = new TypeNode(B); }
+type_specifier_nonarray(A) ::= BVEC4(B).                              { A = new TypeNode(B); }
+type_specifier_nonarray(A) ::= IVEC2(B).                              { A = new TypeNode(B); }
+type_specifier_nonarray(A) ::= IVEC3(B).                              { A = new TypeNode(B); }
+type_specifier_nonarray(A) ::= IVEC4(B).                              { A = new TypeNode(B); }
+type_specifier_nonarray(A) ::= UVEC2(B).                              { A = new TypeNode(B); }
+type_specifier_nonarray(A) ::= UVEC3(B).                              { A = new TypeNode(B); }
+type_specifier_nonarray(A) ::= UVEC4(B).                              { A = new TypeNode(B); }
+type_specifier_nonarray(A) ::= MAT2(B).                               { A = new TypeNode(B); }
+type_specifier_nonarray(A) ::= MAT3(B).                               { A = new TypeNode(B); }
+type_specifier_nonarray(A) ::= MAT4(B).                               { A = new TypeNode(B); }
+type_specifier_nonarray(A) ::= MAT2X2(B).                             { A = new TypeNode(B); }
+type_specifier_nonarray(A) ::= MAT2X3(B).                             { A = new TypeNode(B); }
+type_specifier_nonarray(A) ::= MAT2X4(B).                             { A = new TypeNode(B); }
+type_specifier_nonarray(A) ::= MAT3X2(B).                             { A = new TypeNode(B); }
+type_specifier_nonarray(A) ::= MAT3X3(B).                             { A = new TypeNode(B); }
+type_specifier_nonarray(A) ::= MAT3X4(B).                             { A = new TypeNode(B); }
+type_specifier_nonarray(A) ::= MAT4X2(B).                             { A = new TypeNode(B); }
+type_specifier_nonarray(A) ::= MAT4X3(B).                             { A = new TypeNode(B); }
+type_specifier_nonarray(A) ::= MAT4X4(B).                             { A = new TypeNode(B); }
+type_specifier_nonarray(A) ::= SAMPLER1D(B).                          { A = new TypeNode(B); }
+type_specifier_nonarray(A) ::= SAMPLER2D(B).                          { A = new TypeNode(B); }
+type_specifier_nonarray(A) ::= SAMPLER3D(B).                          { A = new TypeNode(B); }
+type_specifier_nonarray(A) ::= SAMPLERCUBE(B).                        { A = new TypeNode(B); }
+type_specifier_nonarray(A) ::= SAMPLER1DSHADOW(B).                    { A = new TypeNode(B); }
+type_specifier_nonarray(A) ::= SAMPLER2DSHADOW(B).                    { A = new TypeNode(B); }
+type_specifier_nonarray(A) ::= SAMPLERCUBESHADOW(B).                  { A = new TypeNode(B); }
+type_specifier_nonarray(A) ::= SAMPLER1DARRAY(B).                     { A = new TypeNode(B); }
+type_specifier_nonarray(A) ::= SAMPLER2DARRAY(B).                     { A = new TypeNode(B); }
+type_specifier_nonarray(A) ::= SAMPLER1DARRAYSHADOW(B).               { A = new TypeNode(B); }
+type_specifier_nonarray(A) ::= SAMPLER2DARRAYSHADOW(B).               { A = new TypeNode(B); }
+//type_specifier_nonarray(A) ::= SAMPLERCUBESHADOW(B).                { A = new TypeNode(B); }
+//type_specifier_nonarray(A) ::= SAMPLER1DARRAY(B).                   { A = new TypeNode(B); }
+//type_specifier_nonarray(A) ::= SAMPLER2DARRAY(B).                   { A = new TypeNode(B); }
+//type_specifier_nonarray(A) ::= SAMPLER1DARRAYSHADOW(B).             { A = new TypeNode(B); }
+//type_specifier_nonarray(A) ::= SAMPLER2DARRAYSHADOW(B).             { A = new TypeNode(B); }
+type_specifier_nonarray(A) ::= ISAMPLER1D(B).                         { A = new TypeNode(B); }
+type_specifier_nonarray(A) ::= ISAMPLER2D(B).                         { A = new TypeNode(B); }
+type_specifier_nonarray(A) ::= ISAMPLER3D(B).                         { A = new TypeNode(B); }
+type_specifier_nonarray(A) ::= ISAMPLERCUBE(B).                       { A = new TypeNode(B); }
+type_specifier_nonarray(A) ::= ISAMPLER1DARRAY(B).                    { A = new TypeNode(B); }
+type_specifier_nonarray(A) ::= ISAMPLER2DARRAY(B).                    { A = new TypeNode(B); }
+type_specifier_nonarray(A) ::= USAMPLER1D(B).                         { A = new TypeNode(B); }
+type_specifier_nonarray(A) ::= USAMPLER2D(B).                         { A = new TypeNode(B); }
+type_specifier_nonarray(A) ::= USAMPLER3D(B).                         { A = new TypeNode(B); }
+type_specifier_nonarray(A) ::= USAMPLERCUBE(B).                       { A = new TypeNode(B); }
+type_specifier_nonarray(A) ::= USAMPLER1DARRAY(B).                    { A = new TypeNode(B); }
+type_specifier_nonarray(A) ::= USAMPLER2DARRAY(B).                    { A = new TypeNode(B); }
+type_specifier_nonarray(A) ::= struct_specifier(B).                   { A = B; }
+type_specifier_nonarray(A) ::= TYPE_NAME(B).                          { A = new TypeNode(B); }
 
 
 precision_qualifier ::= HIGH_PRECISION .
@@ -410,43 +415,43 @@ struct_declarator ::= IDENTIFIER LEFT_BRACKET constant_expression RIGHT_BRACKET 
 
 
 
-initializer ::= assignment_expression .
+initializer(A) ::= assignment_expression(B) . { A = B; }
 
 
-declaration_statement ::= declaration .
+declaration_statement(A) ::= declaration(B) . { A = B; }
 
-statement ::= compound_statement. 
-statement ::= simple_statement. 
-
-
-simple_statement ::= declaration_statement .
-simple_statement ::= expression_statement. 
-simple_statement ::= selection_statement .
-simple_statement ::= switch_statement .
-simple_statement ::= case_label .
-simple_statement ::= iteration_statement .
-simple_statement ::= jump_statement .
+statement(A) ::= compound_statement(B). { A = B; } 
+statement(A) ::= simple_statement(B). { A = B; }
 
 
-
-compound_statement ::= LEFT_BRACE RIGHT_BRACE .
-compound_statement ::= LEFT_BRACE statement_list RIGHT_BRACE .
-
-
-statement_no_new_scope ::= compound_statement_no_new_scope .
-statement_no_new_scope ::= simple_statement .
-
-
-compound_statement_no_new_scope ::= LEFT_BRACE RIGHT_BRACE. 
-compound_statement_no_new_scope ::= LEFT_BRACE statement_list RIGHT_BRACE.
+simple_statement(A) ::= declaration_statement(B) . { A = B; }
+simple_statement(A) ::= expression_statement(B). { A = B; }
+simple_statement(A) ::= selection_statement(B) . { A = B; }
+simple_statement(A) ::= switch_statement(B) . { A = B; }
+simple_statement(A) ::= case_label(B) . { A = B; }
+simple_statement(A) ::= iteration_statement(B) . { A = B; }
+simple_statement(A) ::= jump_statement(B) . { A = B; }
 
 
-statement_list ::= statement. 
+
+compound_statement(A) ::= LEFT_BRACE RIGHT_BRACE . { A = new Node(); }
+compound_statement(A) ::= LEFT_BRACE statement_list(B) RIGHT_BRACE . { A = B; }
+
+
+statement_no_new_scope(A) ::= compound_statement_no_new_scope(B) . { A = B; }
+statement_no_new_scope(A) ::= simple_statement(B) . { A = B; }
+
+
+compound_statement_no_new_scope(A) ::= LEFT_BRACE RIGHT_BRACE. { A = new Node(); }
+compound_statement_no_new_scope(A) ::= LEFT_BRACE statement_list(B) RIGHT_BRACE. { A = B; }
+
+
+statement_list(A) ::= statement(B).  { A = B; }
 statement_list(A) ::= statement_list(B) statement(C). { A = new Node(B,C); } 
 
 
-expression_statement ::= SEMICOLON .
-expression_statement ::= expression SEMICOLON .
+expression_statement(A) ::= SEMICOLON . { A = new Node(); } 
+expression_statement(A) ::= expression(B) SEMICOLON . { A = B; }
 
 
 selection_statement ::= IF LEFT_PAREN expression RIGHT_PAREN selection_rest_statement .
@@ -455,8 +460,8 @@ selection_statement ::= IF LEFT_PAREN expression RIGHT_PAREN selection_rest_stat
 selection_rest_statement ::= statement .
 
 
-condition ::= expression .
-condition ::= fully_specified_type IDENTIFIER EQUAL initializer .
+condition(A) ::= expression(B). { A = B; }
+condition(A) ::= fully_specified_type(B) IDENTIFIER(C) EQUAL initializer(D) . { A = new Node(B,new IdentifierNode(C),D); }
 
 
 switch_statement ::= SWITCH LEFT_PAREN expression RIGHT_PAREN LEFT_BRACE switch_statement_list RIGHT_BRACE .
@@ -496,11 +501,11 @@ jump_statement ::= DISCARD SEMICOLON .  // Fragment shader only.
 
 
 
-translation_unit(A) ::= external_declaration(B). { A = new Node(B); }
+translation_unit(A) ::= external_declaration(B). { A = B; }
 
 
-external_declaration ::= function_definition. 
-external_declaration ::= declaration. 
+external_declaration(A) ::= function_definition(B). { A = B; }
+external_declaration(A) ::= declaration(B). { A = B; }
 
 
 

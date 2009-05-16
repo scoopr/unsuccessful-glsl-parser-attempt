@@ -1,11 +1,16 @@
 #ifndef LANG_NODE_H
 #define LANG_NODE_H
 
-
+#include <iostream>
 #include <vector>
 #include <string>
 
 #include "Token.h"
+
+static inline void indent(std::ostream& os, int depth) {
+    for(int i = 0; i < depth; ++i) { os << " "; }    
+}
+
 
 class Node {
 public:
@@ -14,16 +19,31 @@ public:
     Node() : terminal(NULL) {}
     Node(Token* term) : terminal(term) {}
     Node(Node* child1) : terminal(NULL) {
-        children.push_back(child1);
+        addChild(child1);
     }
     Node(Node* child1, Node* child2) : terminal(NULL) {
-        children.push_back(child1);
-        children.push_back(child2);
+        addChild(child1);
+        addChild(child2);
     }
     Node(Node* child1, Node* child2, Node* child3) : terminal(NULL) {
-        children.push_back(child1);
-        children.push_back(child2);
-        children.push_back(child3);
+        addChild(child1);
+        addChild(child2);
+        addChild(child3);
+    }
+
+    Node(Node* child1, Node* child2, Node* child3, Node* child4) : terminal(NULL) {
+        addChild(child1);
+        addChild(child2);
+        addChild(child3);
+        addChild(child4);
+    }
+    
+    void addChild(Node* c) {
+        children.push_back(c);
+        if(c) {
+        } else {
+            std::cout << "Warning: null child " << std::endl;
+        }
     }
         
     virtual ~Node() {
@@ -41,10 +61,10 @@ public:
     std::vector<Node*> children;
 
     virtual std::string getNodeName() const { return "Node"; }
-
+//    virtual const std::string& inspect() const { return ""; }
 
     std::ostream& dumpTree(std::ostream& os, int depth = 0) {
-        for(int i = 0; i < depth; ++i) { os << " "; }
+        indent(os,depth);
         os << getNodeName() << " " ;
         if(terminal) {
             os << "[" << terminal->string << "] ";
@@ -56,9 +76,14 @@ public:
             
             for(; i != itEnd; ++i)
             {
-                (*i)->dumpTree(os, depth+1);
+                if(*i) {
+                    (*i)->dumpTree(os, depth+1);                    
+                } else {
+                    indent(os,depth+1);
+                    os << "(null node)" << std::endl;
+                }
             }
-            for(int i = 0; i < depth; ++i) { os << " "; }
+            indent(os,depth);
             os << "}" ;
         }
         os << std::endl;
@@ -109,5 +134,36 @@ public:
     std::string getNodeName() const { return "ParameterDeclarationNode"; }
     
 };
+
+class TypeNode : public Node {
+public:
+    TypeNode(Token* t) : Node(t) {  }
+    std::string getNodeName() const { return "TypeNode"; }
+};
+
+class MultiplicationNode : public Node {    
+public:
+    MultiplicationNode(Node* left, Node* right) : Node(left,right) {  }
+    std::string getNodeName() const { return "MultiplicationNode"; }
+};
+
+class AdditionNode : public Node {    
+public:
+    AdditionNode(Node* left, Node* right) : Node(left,right) {  }
+    std::string getNodeName() const { return "AdditionNode"; }
+};
+
+class CallNode : public Node {    
+public:
+    CallNode(Node* n1, Node* n2) : Node(n1,n2) {  }
+    std::string getNodeName() const { return "CallNode"; }
+};
+
+class AssignNode : public Node {
+public:
+    AssignNode(Node* n1, Node* n2, Token *assignop) : Node(n1,n2) { terminal = assignop;  }
+    std::string getNodeName() const { return "AssignNode"; }    
+};
+
 
 #endif LANG_NODE_H
