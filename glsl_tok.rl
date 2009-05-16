@@ -59,9 +59,9 @@
     UVEC2 = "uvec2" ;
     UVEC3 = "uvec3" ;
     UVEC4 = "uvec4" ;
-    LOWP = "lowp" ;
-    MEDIUMP = "mediump" ;
-    HIGHP = "highp" ;
+    # LOWP = "lowp" ;
+    # MEDIUMP = "mediump" ;
+    # HIGHP = "highp" ;
     PRECISION = "precision" ;
     SAMPLER1D = "sampler1D" ;
     SAMPLER2D = "sampler2D" ;
@@ -179,12 +179,12 @@
 
 
 
-
+#/*LOWP | MEDIUMP | HIGHP |*/
     KEYWORD = ATTRIBUTE | CONST | UNIFORM | VARYING | LAYOUT | CENTROID | FLAT | SMOOTH | NOPERSPECTIVE | BREAK | CONTINUE | DO |
     FOR | WHILE | SWITCH | CASE | DEFAULT | IF | ELSE | IN | OUT | INOUT | FLOAT | INT | VOID | BOOL | TOK_TRUE | TOK_FALSE |
     INVARIANT | DISCARD | RETURN | MAT2 | MAT3 | MAT4 | MAT2X2 | MAT2X3 | MAT2X4 | MAT3X2 | MAT3X3 | MAT3X4 | MAT4X2 |
     MAT4X3 | MAT4X4 | VEC2 | VEC3 | VEC4 | IVEC2 | IVEC3 | IVEC4 | BVEC2 | BVEC3 | BVEC4 | UINT | UVEC2 | UVEC3 | UVEC4
-    | LOWP | MEDIUMP | HIGHP | PRECISION | SAMPLER1D | SAMPLER2D | SAMPLER3D | SAMPLERCUBE | SAMPLER1DSHADOW |
+    |  PRECISION | SAMPLER1D | SAMPLER2D | SAMPLER3D | SAMPLERCUBE | SAMPLER1DSHADOW |
     SAMPLER2DSHADOW | SAMPLERCUBESHADOW | SAMPLER1DARRAY | SAMPLER2DARRAY | SAMPLER1DARRAYSHADOW | SAMPLER2DARRAYSHADOW
     | ISAMPLER1D | ISAMPLER2D | ISAMPLER3D | ISAMPLERCUBE | ISAMPLER1DARRAY | ISAMPLER2DARRAY | USAMPLER1D | USAMPLER2D
     | USAMPLER3D | USAMPLERCUBE | USAMPLER1DARRAY | USAMPLER2DARRAY  | 
@@ -373,9 +373,9 @@
         UVEC2   > tok_start => tok_UVEC2   ;
         UVEC3   > tok_start => tok_UVEC3   ;
         UVEC4   > tok_start => tok_UVEC4   ;
-        LOWP   > tok_start => tok_LOWP   ;
-        MEDIUMP   > tok_start => tok_MEDIUMP   ;
-        HIGHP   > tok_start => tok_HIGHP   ;
+        # LOWP   > tok_start => tok_LOWP   ;
+        # MEDIUMP   > tok_start => tok_MEDIUMP   ;
+        # HIGHP   > tok_start => tok_HIGHP   ;
         PRECISION   > tok_start => tok_PRECISION   ;
         SAMPLER1D   > tok_start => tok_SAMPLER1D   ;
         SAMPLER2D   > tok_start => tok_SAMPLER2D   ;

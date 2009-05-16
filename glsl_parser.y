@@ -225,9 +225,9 @@ constant_expression(A) ::= conditional_expression(B). { A = B; }
 
 declaration(A) ::= function_prototype(B) SEMICOLON. { A = B; }
 declaration(A) ::= init_declarator_list(B) SEMICOLON .{ A = B; }
-// declaration ::= PRECISION precision_qualifier type_specifier_no_prec SEMICOLON .
-// declaration ::= type_qualifier IDENTIFIER LEFT_BRACE struct_declaration_list RIGHT_BRACE SEMICOLON .
-// declaration ::= type_qualifier SEMICOLON .
+declaration ::= PRECISION precision_qualifier type_specifier_no_prec SEMICOLON .
+declaration ::= type_qualifier IDENTIFIER LEFT_BRACE struct_declaration_list RIGHT_BRACE SEMICOLON .
+declaration ::= type_qualifier SEMICOLON .
 
 function_prototype(A) ::= function_declarator(B) RIGHT_PAREN. { A = B; }
 
@@ -260,12 +260,12 @@ parameter_type_specifier(A) ::= type_specifier(B) . { A = B; }
 
 
 init_declarator_list(A) ::= single_declaration(B) . { A = B; }
-init_declarator_list(A) ::= init_declarator_list COMMA IDENTIFIER .
-init_declarator_list(A) ::= init_declarator_list COMMA IDENTIFIER LEFT_BRACKET  RIGHT_BRACKET .
-init_declarator_list(A) ::= init_declarator_list COMMA IDENTIFIER LEFT_BRACKET constant_expression RIGHT_BRACKET .
-init_declarator_list(A) ::= init_declarator_list COMMA IDENTIFIER LEFT_BRACKET RIGHT_BRACKET EQUAL initializer .
-init_declarator_list(A) ::= init_declarator_list COMMA IDENTIFIER LEFT_BRACKET constant_expression RIGHT_BRACKET EQUAL initializer .
-init_declarator_list(A) ::= init_declarator_list COMMA IDENTIFIER EQUAL initializer .
+init_declarator_list ::= init_declarator_list COMMA IDENTIFIER .
+init_declarator_list ::= init_declarator_list COMMA IDENTIFIER LEFT_BRACKET  RIGHT_BRACKET .
+init_declarator_list ::= init_declarator_list COMMA IDENTIFIER LEFT_BRACKET constant_expression RIGHT_BRACKET .
+init_declarator_list ::= init_declarator_list COMMA IDENTIFIER LEFT_BRACKET RIGHT_BRACKET EQUAL initializer .
+init_declarator_list ::= init_declarator_list COMMA IDENTIFIER LEFT_BRACKET constant_expression RIGHT_BRACKET EQUAL initializer .
+init_declarator_list ::= init_declarator_list COMMA IDENTIFIER EQUAL initializer .
 
 
 
@@ -307,15 +307,15 @@ type_qualifier(A) ::= invariant_qualifier type_qualifier(B) . { A = B; }
 //type_qualifier ::= invariant_qualifier interpolation_qualifier type_qualifier . // Cannot be reduced?
 
 
-storage_qualifier ::= CONST .
-storage_qualifier ::= ATTRIBUTE .  // Vertex only. 
-storage_qualifier ::= VARYING .
-storage_qualifier ::= CENTROID VARYING .
-storage_qualifier ::= IN .
-storage_qualifier ::= OUT .
-storage_qualifier ::= CENTROID IN .
-storage_qualifier ::= CENTROID OUT .
-storage_qualifier ::= UNIFORM .
+storage_qualifier(A) ::= CONST(B) . { A = new Node(B); }
+storage_qualifier(A) ::= ATTRIBUTE(B) . { A = new Node(B); } // Vertex only. 
+storage_qualifier(A) ::= VARYING(B) . { A = new Node(B); }
+storage_qualifier(A) ::= CENTROID(B) VARYING(C) . { A = new Node(new Node(B),new Node(C)); }
+storage_qualifier(A) ::= IN(B) . { A = new Node(B); }
+storage_qualifier(A) ::= OUT(B) . { A = new Node(B); }
+storage_qualifier(A) ::= CENTROID(B) IN(C) . { A = new Node(new Node(B),new Node(C)); }
+storage_qualifier(A) ::= CENTROID(B) OUT(C) . { A = new Node(new Node(B),new Node(C)); }
+storage_qualifier(A) ::= UNIFORM(B) . { A = new Node(B); }
 
 
 
@@ -502,6 +502,7 @@ jump_statement ::= DISCARD SEMICOLON .  // Fragment shader only.
 
 
 translation_unit(A) ::= external_declaration(B). { A = B; }
+translation_unit(A) ::= translation_unit(B) external_declaration(C). { A = B; A->addChild(C); }
 
 
 external_declaration(A) ::= function_definition(B). { A = B; }

@@ -10,7 +10,7 @@
 #define GLSL_USAMPLER2DRECT     9992*0
 #define GLSL_ISAMPLERBUFFER     9991*0
 #define GLSL_USAMPLERBUFFER     9990*0
-#define GLSL_PRECISION          9989*0
+//#define GLSL_PRECISION          9989*0
 
 
 %%{
@@ -249,11 +249,11 @@ public:
 
     void emitToken(int id) {
         if(tok_start) {
-            column += tokenLen();
             TokenizerContext& tc = *this;
             Token *t = new Token(id, std::string(tok_start, tokenLen()), tc.filename, tc.line, tc.column);
             std::cout << "Token accepted : " << *t << std::endl;
             glslparser(tc.parser, id, t);
+            column += tokenLen();
             tok_start = NULL;
             if(syntax_error) p = pe; // eww..
         }
