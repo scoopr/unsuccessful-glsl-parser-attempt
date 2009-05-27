@@ -63,7 +63,6 @@ Right to Left
 
 
 
-
 %syntax_error {
     syntax_error = true;
 //    throw std::runtime_error("Syntax terror!")
@@ -100,7 +99,7 @@ primary_expression(A) ::= variable_identifier(B). { A = B; }
 primary_expression(A) ::= FLOATCONSTANT(B). { A = new FloatNode(B); }
 primary_expression(A) ::= INTCONSTANT(B). { A = new IntNode(B); }
 primary_expression(A) ::= UINTCONSTANT(B). { A = new Node(B); }
-primary_expression(A) ::= LEFT_PAREN expression(B) RIGHT_PAREN. { A = new Node(B); }
+primary_expression(A) ::= LEFT_PAREN expression(B) RIGHT_PAREN. { A = B; }
 
 
 postfix_expression(A) ::= primary_expression(B) . { A = B; }
