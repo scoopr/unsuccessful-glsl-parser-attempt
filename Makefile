@@ -9,7 +9,7 @@ LEMON=lemon
 
 TARGET=glsl_examples
 
-CXXFLAGS += -Wall -Wextra 
+CXXFLAGS += -ggdb -Wall -Wextra  -pedantic
 LDFLAGS +=
 
 SRCS = main.cpp Token.cpp

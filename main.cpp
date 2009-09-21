@@ -12,6 +12,8 @@
 
 int main(int argc, char **argv) {
 
+    int retval = EXIT_SUCCESS;
+
     if ( argc > 1 ) { 
 
         FILE *f = fopen(argv[1], "r");
@@ -33,7 +35,10 @@ int main(int argc, char **argv) {
 
         if(tree) {
             tree->dumpTree(std::cout);
-        } else { std::cout << "No tree?" << std::endl; }
+        } else { 
+            std::cout << "No tree?" << std::endl; 
+            retval = EXIT_FAILURE;
+        }
 
         glslparserFree(pglslparser, free );
 
@@ -43,6 +48,6 @@ int main(int argc, char **argv) {
     } 
 
 
-    return 0;
+    return retval;
 }
 

@@ -66,7 +66,10 @@ Right to Left
 %syntax_error {
     syntax_error = true;
 //    throw std::runtime_error("Syntax terror!")
-    std::cout << "Syntax error on token: " << *TOKEN << std::endl;
+    if(TOKEN)
+        std::cout << "Syntax error on token: " << *TOKEN << std::endl;
+    else
+        std::cout << "ICE" << std::endl;
 }
 
 
@@ -419,13 +422,16 @@ initializer(A) ::= assignment_expression(B) . { A = B; }
 
 declaration_statement(A) ::= declaration(B) . { A = B; }
 
+
 statement(A) ::= compound_statement(B). { A = B; } 
-statement(A) ::= simple_statement(B). { A = B; }
+statement(A) ::= matched_selection_statement(B). { A = B; }
+statement(A) ::= unmatched_selection_statement(B). { A = B; }
 
 
 simple_statement(A) ::= declaration_statement(B) . { A = B; }
 simple_statement(A) ::= expression_statement(B). { A = B; }
-simple_statement(A) ::= selection_statement(B) . { A = B; }
+//simple_statement(A) ::= matched_selection_statement(B) . { A = B; }
+//simple_statement(A) ::= unmatched_selection_statement(B) . { A = B; }
 simple_statement(A) ::= switch_statement(B) . { A = B; }
 simple_statement(A) ::= case_label(B) . { A = B; }
 simple_statement(A) ::= iteration_statement(B) . { A = B; }
@@ -453,10 +459,14 @@ expression_statement(A) ::= SEMICOLON . { A = new Node(); }
 expression_statement(A) ::= expression(B) SEMICOLON . { A = B; }
 
 
-selection_statement ::= IF LEFT_PAREN expression RIGHT_PAREN selection_rest_statement .
+matched_selection_statement(A) ::= IF LEFT_PAREN expression(B) RIGHT_PAREN matched_selection_statement(C) ELSE matched_selection_statement(D) . { A = new SelectionNode(B,C,D); }
+matched_selection_statement(A) ::= simple_statement(B) . { A = B; }
+
+unmatched_selection_statement(A) ::= IF LEFT_PAREN expression(B) RIGHT_PAREN statement(C) . { A = new SelectionNode(B,C,NULL); }
+unmatched_selection_statement(A) ::= IF LEFT_PAREN expression(B) RIGHT_PAREN matched_selection_statement(C) ELSE unmatched_selection_statement(D) . { A = new SelectionNode(B,C,D); }
 
 //selection_rest_statement ::= statement ELSE statement . // TODO: conflict?!
-selection_rest_statement ::= statement .
+//selection_rest_statement ::= statement .
 
 
 condition(A) ::= expression(B). { A = B; }
@@ -501,7 +511,7 @@ jump_statement ::= DISCARD SEMICOLON .  // Fragment shader only.
 
 
 translation_unit(A) ::= external_declaration(B). { A = B; }
-translation_unit(A) ::= translation_unit(B) external_declaration(C). { A = B; A->addChild(C); }
+translation_unit(A) ::= translation_unit(B) external_declaration(C). { A =  new Node(B); A->addChild(C); }
 
 
 external_declaration(A) ::= function_definition(B). { A = B; }

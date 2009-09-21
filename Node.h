@@ -165,5 +165,10 @@ public:
     std::string getNodeName() const { return "AssignNode"; }    
 };
 
+class SelectionNode : public Node {
+public:
+    SelectionNode(Node* expr, Node *then, Node *otherwise) : Node(expr,then,otherwise) {}
+    std::string getNodeName() const { return "SelectionNode"; }    
+};
 
 #endif LANG_NODE_H
