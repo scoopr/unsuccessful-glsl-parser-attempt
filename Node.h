@@ -42,7 +42,7 @@ public:
         children.push_back(c);
         if(c) {
         } else {
-            std::cout << "Warning: null child " << std::endl;
+            std::cerr << "Warning: null child " << std::endl;
         }
     }
         
@@ -169,6 +169,12 @@ class SelectionNode : public Node {
 public:
     SelectionNode(Node* expr, Node *then, Node *otherwise) : Node(expr,then,otherwise) {}
     std::string getNodeName() const { return "SelectionNode"; }    
+};
+
+class RelationalNode : public Node {
+public:
+    RelationalNode(Node* n1, Node* n2, Token *relationop) : Node(n1,n2) { terminal = relationop;  }
+    std::string getNodeName() const { return "RelationalNode"; }    
 };
 
 #endif LANG_NODE_H

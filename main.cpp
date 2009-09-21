@@ -36,7 +36,7 @@ int main(int argc, char **argv) {
         if(tree) {
             tree->dumpTree(std::cout);
         } else { 
-            std::cout << "No tree?" << std::endl; 
+            std::cerr << "No tree?" << std::endl; 
             retval = EXIT_FAILURE;
         }
 

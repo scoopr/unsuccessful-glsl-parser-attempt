@@ -165,10 +165,10 @@ shift_expression(A) ::= shift_expression RIGHT_OP additive_expression .
 
 
 relational_expression(A) ::= shift_expression(B) . { A = B; }
-relational_expression(A) ::= relational_expression LEFT_ANGLE shift_expression .
-relational_expression(A) ::= relational_expression RIGHT_ANGLE shift_expression .
-relational_expression(A) ::= relational_expression LE_OP shift_expression .
-relational_expression(A) ::= relational_expression GE_OP shift_expression .
+relational_expression(A) ::= relational_expression(B) LEFT_ANGLE(C) shift_expression(D) . { A = new RelationalNode(B,D,C); }
+relational_expression(A) ::= relational_expression(B) RIGHT_ANGLE(C) shift_expression(D) . { A = new RelationalNode(B,D,C); }
+relational_expression(A) ::= relational_expression(B) LE_OP(C) shift_expression(D) . { A = new RelationalNode(B,D,C); }
+relational_expression(A) ::= relational_expression(B) GE_OP(C) shift_expression(D) . { A = new RelationalNode(B,D,C); }
 
 
 equality_expression(A) ::= relational_expression(B) . { A = B; }
@@ -262,12 +262,12 @@ parameter_type_specifier(A) ::= type_specifier(B) . { A = B; }
 
 
 init_declarator_list(A) ::= single_declaration(B) . { A = B; }
-init_declarator_list ::= init_declarator_list COMMA IDENTIFIER .
-init_declarator_list ::= init_declarator_list COMMA IDENTIFIER LEFT_BRACKET  RIGHT_BRACKET .
-init_declarator_list ::= init_declarator_list COMMA IDENTIFIER LEFT_BRACKET constant_expression RIGHT_BRACKET .
-init_declarator_list ::= init_declarator_list COMMA IDENTIFIER LEFT_BRACKET RIGHT_BRACKET EQUAL initializer .
-init_declarator_list ::= init_declarator_list COMMA IDENTIFIER LEFT_BRACKET constant_expression RIGHT_BRACKET EQUAL initializer .
-init_declarator_list ::= init_declarator_list COMMA IDENTIFIER EQUAL initializer .
+init_declarator_list(A) ::= init_declarator_list(B) COMMA IDENTIFIER(C) . { A = B; B->addChild(new Node(C)); }
+init_declarator_list(A) ::= init_declarator_list(B) COMMA IDENTIFIER(C) LEFT_BRACKET  RIGHT_BRACKET .
+init_declarator_list(A) ::= init_declarator_list(B) COMMA IDENTIFIER(C) LEFT_BRACKET constant_expression(D) RIGHT_BRACKET .
+init_declarator_list(A) ::= init_declarator_list(B) COMMA IDENTIFIER(C) LEFT_BRACKET RIGHT_BRACKET EQUAL initializer(D) .
+init_declarator_list(A) ::= init_declarator_list(B) COMMA IDENTIFIER(C) LEFT_BRACKET constant_expression(D) RIGHT_BRACKET EQUAL initializer(E) .
+init_declarator_list(A) ::= init_declarator_list(B) COMMA IDENTIFIER(C) EQUAL initializer(D) .
 
 
 
@@ -451,8 +451,8 @@ compound_statement_no_new_scope(A) ::= LEFT_BRACE RIGHT_BRACE. { A = new Node();
 compound_statement_no_new_scope(A) ::= LEFT_BRACE statement_list(B) RIGHT_BRACE. { A = B; }
 
 
-statement_list(A) ::= statement(B).  { A = B; }
-statement_list(A) ::= statement_list(B) statement(C). { A = new Node(B,C); } 
+statement_list(A) ::= statement(B).  { A = new Node(B); }
+statement_list(A) ::= statement_list(B) statement(C). { A = B; if(B) B->addChild(C); } 
 
 
 expression_statement(A) ::= SEMICOLON . { A = new Node(); } 
@@ -479,8 +479,8 @@ switch_statement_list ::= .
 switch_statement_list ::= statement_list.
 
 
-case_label ::= CASE expression COLON .
-case_label ::= DEFAULT COLON .
+case_label(A) ::= CASE expression(B) COLON . { A = new Node(B); }
+case_label(A) ::= DEFAULT(B) COLON . { A = new Node(B); }
 
 
 iteration_statement ::= WHILE LEFT_PAREN condition RIGHT_PAREN statement_no_new_scope .
@@ -502,11 +502,11 @@ for_rest_statement ::= conditionopt SEMICOLON expression .
 
 
 
-jump_statement ::= CONTINUE SEMICOLON .
-jump_statement ::= BREAK SEMICOLON .
-jump_statement ::= RETURN SEMICOLON .
-jump_statement ::= RETURN expression SEMICOLON .
-jump_statement ::= DISCARD SEMICOLON .  // Fragment shader only. 
+jump_statement(A) ::= CONTINUE(B) SEMICOLON . { A = new Node(B); }
+jump_statement(A) ::= BREAK(B) SEMICOLON . { A = new Node(B); }
+jump_statement(A) ::= RETURN SEMICOLON . { A = new Node(); }
+jump_statement(A) ::= RETURN expression(C) SEMICOLON . { A = new Node(C); }
+jump_statement(A) ::= DISCARD(B) SEMICOLON .  { A = new Node(B); } // Fragment shader only. 
 
 
 

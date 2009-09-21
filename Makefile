@@ -25,12 +25,12 @@ all: $(TARGET)
 
 .frag.fout:
 	@echo Testing $< .. 
-	@./glsl $<
+	@./glsl $< > $@
 	@touch $@
 
 .vert.vout:
 	@echo Testing $< .. 
-	@./glsl $<
+	@./glsl $< > $@
 	@touch $@
 
 .rl.cpp:
