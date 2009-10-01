@@ -219,8 +219,8 @@
     
     INC_OP  = "++";
     DEC_OP  = "--";
-    LE_OP  = "<";
-    GE_OP  = ">";
+    LE_OP  = "<=";
+    GE_OP  = ">=";
     EQ_OP  = "==";
     NE_OP  = "!=";    
     AND_OP = "&&";
