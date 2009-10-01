@@ -190,5 +190,10 @@ public:
     std::string getNodeName() const { return "LogicalOpNode"; }
 };
 
+class EqualityOpNode : public Node {
+public:
+    EqualityOpNode(Node *n1, Node *n2, Token *op) : Node(n1,n2) { terminal = op; }
+    std::string getNodeName() const { return "EqualityOpNode"; }
+};
 
 #endif LANG_NODE_H

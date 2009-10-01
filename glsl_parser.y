@@ -172,8 +172,8 @@ relational_expression(A) ::= relational_expression(B) GE_OP(C) shift_expression(
 
 
 equality_expression(A) ::= relational_expression(B) . { A = B; }
-equality_expression(A) ::= equality_expression EQ_OP relational_expression .
-equality_expression(A) ::= equality_expression NE_OP relational_expression .
+equality_expression(A) ::= equality_expression(B) EQ_OP(C) relational_expression(D) . { A = new EqualityOpNode(B, D, C); }
+equality_expression(A) ::= equality_expression(B) NE_OP(C) relational_expression(D) . { A = new EqualityOpNode(B, D, C); }
 
 and_expression(A) ::= equality_expression(B) . { A = B; }
 and_expression(A) ::= and_expression AMPERSAND equality_expression.
