@@ -168,6 +168,7 @@ public:
 class SelectionNode : public Node {
 public:
     SelectionNode(Node* expr, Node *then, Node *otherwise) : Node(expr,then,otherwise) {}
+    SelectionNode(Node* expr, Node *then) : Node(expr,then) {}
     std::string getNodeName() const { return "SelectionNode"; }    
 };
 
@@ -181,6 +182,12 @@ class FunctionDeclarationNode : public Node {
 public:
     FunctionDeclarationNode(Node* n1, Node *n2) : Node(n1,n2) {  }
     std::string getNodeName() const { return "FunctionDeclarationNode"; }
+};
+
+class LogicalOpNode : public Node {
+public:
+    LogicalOpNode(Node *n1, Node *n2, Token *op) : Node(n1,n2) { terminal = op; }
+    std::string getNodeName() const { return "LogicalOpNode"; }
 };
 
 

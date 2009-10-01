@@ -182,16 +182,16 @@ exclusive_or_expression(A) ::= and_expression(B) . { A = B; }
 exclusive_or_expression(A) ::= exclusive_or_expression CARET and_expression .
 
 inclusive_or_expression(A) ::= exclusive_or_expression(B) . { A = B; }
-inclusive_or_expression(A) ::= inclusive_or_expression VERTICAL_BAR exclusive_or_expression .
+inclusive_or_expression(A) ::= inclusive_or_expression(B) VERTICAL_BAR(C) exclusive_or_expression(D) . { A = new LogicalOpNode(B,D,C); }
 
 logical_and_expression(A) ::= inclusive_or_expression(B) . { A = B; }
-logical_and_expression(A) ::= logical_and_expression AND_OP inclusive_or_expression .
+logical_and_expression(A) ::= logical_and_expression(B) AND_OP(C) inclusive_or_expression(D) . { A = new LogicalOpNode(B,D,C); }
 
 logical_xor_expression(A) ::= logical_and_expression(B) . { A = B; }
-logical_xor_expression(A) ::= logical_xor_expression XOR_OP logical_and_expression .
+logical_xor_expression(A) ::= logical_xor_expression(B) XOR_OP(C) logical_and_expression(D) . { A = new LogicalOpNode(B,D,C); }
 
 logical_or_expression(A) ::= logical_xor_expression(B) . { A = B; }
-logical_or_expression(A) ::= logical_or_expression OR_OP logical_xor_expression .
+logical_or_expression(A) ::= logical_or_expression(B) OR_OP(C) logical_xor_expression(D) . { A = new LogicalOpNode(B,D,C); }
 
 
 conditional_expression(A) ::= logical_or_expression(B) . { A = B; }
@@ -462,7 +462,7 @@ expression_statement(A) ::= expression(B) SEMICOLON . { A = B; }
 matched_selection_statement(A) ::= IF LEFT_PAREN expression(B) RIGHT_PAREN matched_selection_statement(C) ELSE matched_selection_statement(D) . { A = new SelectionNode(B,C,D); }
 matched_selection_statement(A) ::= simple_statement(B) . { A = B; }
 
-unmatched_selection_statement(A) ::= IF LEFT_PAREN expression(B) RIGHT_PAREN statement(C) . { A = new SelectionNode(B,C,NULL); }
+unmatched_selection_statement(A) ::= IF LEFT_PAREN expression(B) RIGHT_PAREN statement(C) . { A = new SelectionNode(B,C); }
 unmatched_selection_statement(A) ::= IF LEFT_PAREN expression(B) RIGHT_PAREN matched_selection_statement(C) ELSE unmatched_selection_statement(D) . { A = new SelectionNode(B,C,D); }
 
 //selection_rest_statement ::= statement ELSE statement . // TODO: conflict?!
