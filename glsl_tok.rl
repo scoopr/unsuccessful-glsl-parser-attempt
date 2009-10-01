@@ -223,9 +223,9 @@
     GE_OP  = ">";
     EQ_OP  = "==";
     NE_OP  = "!=";    
-    AND_OP = "&";
-    OR_OP = "|";
-    XOR_OP = "^";
+    AND_OP = "&&";
+    OR_OP = "||";
+    XOR_OP = "^^";  # Yes really!
     MUL_ASSIGN = "*=";
     DIV_ASSIGN = "/=";
     ADD_ASSIGN = "+=";
