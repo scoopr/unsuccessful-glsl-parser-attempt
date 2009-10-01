@@ -306,11 +306,38 @@
 
     IMMEDIATES = FLOATCONSTANT | INTCONSTANT ;
 
+
+
+
     LINE = "\n" $ line;
     ws=([ \r] $ column)* | ([\t] $ tab_column)*;
 
+    HASH = "#" ws;
 
+    REST = (any* - (any* "\n" any*) $ column) ("\n" $ line);
 
+    # TODO: make sure hash is first non-whitespace on line ..
+    PP_DEFINE    = HASH "define" REST;
+    PP_UNDEF     = HASH "undef" REST;
+    PP_IF        = HASH "if" REST;
+    PP_IFDEF     = HASH "ifdef" REST;
+    PP_IFNDEF    = HASH "ifndef" REST;
+    PP_ELSE      = HASH "else" REST;
+    PP_ELIF      = HASH "elif" REST;
+    PP_ENDIF     = HASH "endif" REST;
+    PP_ERROR     = HASH "error" REST;
+    PP_PRAGMA    = HASH "pragma" REST;
+    PP_EXTENSION = HASH "extension" REST;
+    PP_VERSION   = HASH "version" REST;
+    PP_LINE      = HASH "line" REST;
+
+    PP_DEFINED  = "defined" ;
+    PP_CONCAT   = "##" ;
+
+    PREPROCESSOR = PP_DEFINE | PP_UNDEF | PP_IF | PP_IFDEF | PP_IFNDEF | PP_ELSE | 
+                   PP_ELIF | PP_ENDIF | PP_ERROR | PP_PRAGMA | PP_EXTENSION | 
+                   PP_VERSION | PP_LINE | PP_DEFINED | PP_CONCAT; 
+                   
     main := |*
  
  
@@ -472,6 +499,8 @@
 
         LINE_COMMENT;
         BLOCK_COMMENT;
+
+        PREPROCESSOR;
 
         *| ;
 
