@@ -177,4 +177,11 @@ public:
     std::string getNodeName() const { return "RelationalNode"; }    
 };
 
+class FunctionDeclarationNode : public Node {
+public:
+    FunctionDeclarationNode(Node* n1, Node *n2) : Node(n1,n2) {  }
+    std::string getNodeName() const { return "FunctionDeclarationNode"; }
+};
+
+
 #endif LANG_NODE_H

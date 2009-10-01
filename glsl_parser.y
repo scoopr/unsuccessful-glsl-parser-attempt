@@ -240,7 +240,7 @@ function_header_with_parameters(A) ::= function_header(B) parameter_declaration(
 function_header_with_parameters(A) ::= function_header_with_parameters(B) COMMA parameter_declaration(C). { A = B; B->addChild(C); }
 
 //function_header(A) ::= fully_specified_type(B) IDENTIFIER(C) LEFT_PAREN. { A = new Node(B,C); }
-function_header(A) ::= fully_specified_type(B) IDENTIFIER(C) LEFT_PAREN. { A = new Node(B,new IdentifierNode(C)); }
+function_header(A) ::= fully_specified_type(B) IDENTIFIER(C) LEFT_PAREN. { A = new FunctionDeclarationNode(B,new IdentifierNode(C)); }
 
 
 parameter_declarator(A) ::= type_specifier(B) IDENTIFIER(C). { A = new Node(B, new IdentifierNode(C)); }
@@ -520,7 +520,7 @@ external_declaration(A) ::= declaration(B). { A = B; }
 
 
 
-function_definition(A) ::= function_prototype(B) compound_statement_no_new_scope(C). { A = new Node(B,C); } 
+function_definition(A) ::= function_prototype(B) compound_statement_no_new_scope(C). { A = B; B->addChild(C); } 
 
 
 
