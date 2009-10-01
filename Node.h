@@ -196,4 +196,11 @@ public:
     std::string getNodeName() const { return "EqualityOpNode"; }
 };
 
+class IterationNode : public Node {
+public:
+    IterationNode(Node *init, Node *expr, Node *stmt) : Node(init,expr,stmt) {}
+    IterationNode(Node *expr, Node *stmt) : Node(expr,stmt) {}
+    std::string getNodeName() const { return "IterationNode"; }
+};
+
 #endif LANG_NODE_H

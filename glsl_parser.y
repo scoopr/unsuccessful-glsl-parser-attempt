@@ -423,7 +423,7 @@ initializer(A) ::= assignment_expression(B) . { A = B; }
 declaration_statement(A) ::= declaration(B) . { A = B; }
 
 
-statement(A) ::= compound_statement(B). { A = B; } 
+//statement(A) ::= compound_statement(B). { A = B; } 
 statement(A) ::= matched_selection_statement(B). { A = B; }
 statement(A) ::= unmatched_selection_statement(B). { A = B; }
 
@@ -461,6 +461,7 @@ expression_statement(A) ::= expression(B) SEMICOLON . { A = B; }
 
 matched_selection_statement(A) ::= IF LEFT_PAREN expression(B) RIGHT_PAREN matched_selection_statement(C) ELSE matched_selection_statement(D) . { A = new SelectionNode(B,C,D); }
 matched_selection_statement(A) ::= simple_statement(B) . { A = B; }
+matched_selection_statement(A) ::= compound_statement(B) . { A = B; }
 
 unmatched_selection_statement(A) ::= IF LEFT_PAREN expression(B) RIGHT_PAREN statement(C) . { A = new SelectionNode(B,C); }
 unmatched_selection_statement(A) ::= IF LEFT_PAREN expression(B) RIGHT_PAREN matched_selection_statement(C) ELSE unmatched_selection_statement(D) . { A = new SelectionNode(B,C,D); }
@@ -483,21 +484,21 @@ case_label(A) ::= CASE expression(B) COLON . { A = new Node(B); }
 case_label(A) ::= DEFAULT(B) COLON . { A = new Node(B); }
 
 
-iteration_statement ::= WHILE LEFT_PAREN condition RIGHT_PAREN statement_no_new_scope .
-iteration_statement ::= DO statement WHILE LEFT_PAREN expression RIGHT_PAREN SEMICOLON .
-iteration_statement ::= FOR LEFT_PAREN for_init_statement for_rest_statement RIGHT_PAREN statement_no_new_scope .
+iteration_statement(A) ::= WHILE LEFT_PAREN condition(B) RIGHT_PAREN statement_no_new_scope(C) . { A = new IterationNode(B,C); }
+iteration_statement(A) ::= DO statement(B) WHILE LEFT_PAREN expression(C) RIGHT_PAREN SEMICOLON . { A = new IterationNode(C,B); }
+iteration_statement(A) ::= FOR LEFT_PAREN for_init_statement(B) for_rest_statement(C) RIGHT_PAREN statement_no_new_scope(D) . { A = new IterationNode(B,C,D); }
 
-for_init_statement ::= expression_statement .
-for_init_statement ::= declaration_statement .
-
-
-conditionopt ::= condition .
-conditionopt ::= .        /* empty */ 
+for_init_statement(A) ::= expression_statement(B) . { A = B; }
+for_init_statement(A) ::= declaration_statement(B) . { A = B; }
 
 
+conditionopt(A) ::= condition(B) . { A = B; }
+conditionopt(A) ::= . { A = new Node(); }        /* empty */ 
 
-for_rest_statement ::= conditionopt SEMICOLON .
-for_rest_statement ::= conditionopt SEMICOLON expression .
+
+
+for_rest_statement(A) ::= conditionopt(B) SEMICOLON . { A = B; }
+for_rest_statement(A) ::= conditionopt(B) SEMICOLON expression(C) . { A = B; A->addChild(C); }
 
 
 
