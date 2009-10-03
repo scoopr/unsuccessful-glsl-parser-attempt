@@ -100,7 +100,7 @@ Right to Left
 program ::= translation_unit(A).   { state->result = A; }
 
 
-variable_identifier(A) ::= IDENTIFIER(B). { A = new IdentifierNode(B); }
+variable_identifier(A) ::= IDENTIFIER(B). { A = state->identifier(B); }
 
 primary_expression(A) ::= variable_identifier(B). { A = B; }
 primary_expression(A) ::= FLOATCONSTANT(B). { A = new FloatNode(B); }
@@ -112,7 +112,7 @@ primary_expression(A) ::= LEFT_PAREN expression(B) RIGHT_PAREN. { A = B; }
 postfix_expression(A) ::= primary_expression(B) . { A = B; }
 postfix_expression(A) ::= postfix_expression(B) LEFT_BRACKET integer_expression(C) RIGHT_BRACKET . { A = new Node(B,C); }
 postfix_expression(A) ::= function_call(B) . { A = B; }
-postfix_expression(A) ::= postfix_expression(B) DOT IDENTIFIER(C) . { A = new Node(B,new IdentifierNode(C)); }
+postfix_expression(A) ::= postfix_expression(B) DOT IDENTIFIER(C) . { A = new Node(B,state->identifier(C)); }
 //postfix_expression ::= postfix_expression DOT FIELD_SELECTION .
 postfix_expression(A) ::= postfix_expression(B) INC_OP . { A = B; }
 postfix_expression(A) ::= postfix_expression(B) DEC_OP . { A = B; }
@@ -136,7 +136,7 @@ function_call_header_with_parameters(A) ::= function_call_header_with_parameters
 function_call_header(A) ::= function_identifier(B) LEFT_PAREN . { A = B; }
 
 function_identifier(A) ::= type_specifier(B) .  { A = B; }
-function_identifier(A) ::= IDENTIFIER(B) .      { A  = new IdentifierNode(B); }
+function_identifier(A) ::= IDENTIFIER(B) .      { A  = state->identifier(B); }
 // function_identifier ::= FIELD_SELECTION .
 
 
@@ -244,11 +244,11 @@ function_header_with_parameters(A) ::= function_header(B) parameter_declaration(
 function_header_with_parameters(A) ::= function_header_with_parameters(B) COMMA parameter_declaration(C). { A = B; B->addChild(C); }
 
 //function_header(A) ::= fully_specified_type(B) IDENTIFIER(C) LEFT_PAREN. { A = new Node(B,C); }
-function_header(A) ::= fully_specified_type(B) IDENTIFIER(C) LEFT_PAREN. { A = new FunctionDeclarationNode(B,new IdentifierNode(C)); }
+function_header(A) ::= fully_specified_type(B) IDENTIFIER(C) LEFT_PAREN. { A = new FunctionDeclarationNode(B,state->identifier(C)); }
 
 
-parameter_declarator(A) ::= type_specifier(B) IDENTIFIER(C). { A = new Node(B, new IdentifierNode(C)); }
-parameter_declarator(A) ::= type_specifier(B) IDENTIFIER(C) LEFT_BRACKET constant_expression(D) RIGHT_BRACKET. { A = new Node(B, new IdentifierNode(C), D); }
+parameter_declarator(A) ::= type_specifier(B) IDENTIFIER(C). { A = new Node(B, state->identifier(C)); }
+parameter_declarator(A) ::= type_specifier(B) IDENTIFIER(C) LEFT_BRACKET constant_expression(D) RIGHT_BRACKET. { A = new Node(B, state->identifier(C), D); }
 
 parameter_declaration(A) ::= parameter_type_qualifier(B) parameter_qualifier(C) parameter_declarator(D). { A = new ParameterDeclarationNode(B,C,D); }
 parameter_declaration(A) ::= parameter_qualifier(B) parameter_declarator(C) . { A = new ParameterDeclarationNode(B,C); }
@@ -266,22 +266,22 @@ parameter_type_specifier(A) ::= type_specifier(B) . { A = B; }
 
 
 init_declarator_list(A) ::= single_declaration(B) . { A = B; }
-init_declarator_list(A) ::= init_declarator_list(B) COMMA IDENTIFIER(C) . { A = B; B->addChild(new IdentifierNode(C)); }
+init_declarator_list(A) ::= init_declarator_list(B) COMMA IDENTIFIER(C) . { A = B; B->addChild(state->identifier(C)); }
 init_declarator_list(A) ::= init_declarator_list(B) COMMA IDENTIFIER(C) LEFT_BRACKET  RIGHT_BRACKET .
 init_declarator_list(A) ::= init_declarator_list(B) COMMA IDENTIFIER(C) LEFT_BRACKET constant_expression(D) RIGHT_BRACKET .
 init_declarator_list(A) ::= init_declarator_list(B) COMMA IDENTIFIER(C) LEFT_BRACKET RIGHT_BRACKET EQUAL initializer(D) .
 init_declarator_list(A) ::= init_declarator_list(B) COMMA IDENTIFIER(C) LEFT_BRACKET constant_expression(D) RIGHT_BRACKET EQUAL initializer(E) .
-init_declarator_list(A) ::= init_declarator_list(B) COMMA IDENTIFIER(C) EQUAL initializer(D) . { A = B; IdentifierNode* c = new IdentifierNode(C); c->addChild(D); B->addChild(c); }
+init_declarator_list(A) ::= init_declarator_list(B) COMMA IDENTIFIER(C) EQUAL initializer(D) . { A = B; IdentifierNode* c = state->identifier(C); c->addChild(D); B->addChild(c); }
 
 
 
 single_declaration(A) ::= fully_specified_type(B) . { A = B; }
-single_declaration(A) ::= fully_specified_type(B) IDENTIFIER(C) . { A = new Node(B, new IdentifierNode(C)); }
-single_declaration(A) ::= fully_specified_type(B) IDENTIFIER(C) LEFT_BRACKET  RIGHT_BRACKET . { A = new Node(B, new IdentifierNode(C)); }
-single_declaration(A) ::= fully_specified_type(B) IDENTIFIER(C) LEFT_BRACKET constant_expression(D) RIGHT_BRACKET . { A = new Node(B, new IdentifierNode(C), D); }
-single_declaration(A) ::= fully_specified_type(B) IDENTIFIER(C) LEFT_BRACKET RIGHT_BRACKET EQUAL initializer(D) . { A = new Node(B, new IdentifierNode(C) ,D); }
-single_declaration(A) ::= fully_specified_type(B) IDENTIFIER(C) LEFT_BRACKET constant_expression(D) RIGHT_BRACKET EQUAL initializer(E) . { A = new Node(B, new IdentifierNode(C), D ,E); }
-single_declaration(A) ::= fully_specified_type(B) IDENTIFIER(C) EQUAL initializer(D) . { A = new Node(B, new IdentifierNode(C),D); }
+single_declaration(A) ::= fully_specified_type(B) IDENTIFIER(C) . { A = new Node(B, state->identifier(C)); }
+single_declaration(A) ::= fully_specified_type(B) IDENTIFIER(C) LEFT_BRACKET  RIGHT_BRACKET . { A = new Node(B, state->identifier(C)); }
+single_declaration(A) ::= fully_specified_type(B) IDENTIFIER(C) LEFT_BRACKET constant_expression(D) RIGHT_BRACKET . { A = new Node(B, state->identifier(C), D); }
+single_declaration(A) ::= fully_specified_type(B) IDENTIFIER(C) LEFT_BRACKET RIGHT_BRACKET EQUAL initializer(D) . { A = new Node(B, state->identifier(C) ,D); }
+single_declaration(A) ::= fully_specified_type(B) IDENTIFIER(C) LEFT_BRACKET constant_expression(D) RIGHT_BRACKET EQUAL initializer(E) . { A = new Node(B, state->identifier(C), D ,E); }
+single_declaration(A) ::= fully_specified_type(B) IDENTIFIER(C) EQUAL initializer(D) . { A = new Node(B, state->identifier(C),D); }
 single_declaration(A) ::= INVARIANT IDENTIFIER .  // Vertex only. 
 
 
@@ -475,7 +475,7 @@ unmatched_selection_statement(A) ::= IF LEFT_PAREN expression(B) RIGHT_PAREN mat
 
 
 condition(A) ::= expression(B). { A = B; }
-condition(A) ::= fully_specified_type(B) IDENTIFIER(C) EQUAL initializer(D) . { A = new Node(B,new IdentifierNode(C),D); }
+condition(A) ::= fully_specified_type(B) IDENTIFIER(C) EQUAL initializer(D) . { A = new Node(B,state->identifier(C),D); }
 
 
 switch_statement ::= SWITCH LEFT_PAREN expression RIGHT_PAREN LEFT_BRACE switch_statement_list RIGHT_BRACE .

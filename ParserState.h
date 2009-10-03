@@ -3,7 +3,11 @@
 
 #include <cstdlib>
 
+#include "Node.h"
+
 class Node;
+class Token;
+class IdentifierNode;
 
 class ParserState {
 public:
@@ -11,6 +15,9 @@ public:
     
     bool syntax_error;
     Node* result;
+    
+    IdentifierNode* identifier(Token* token);
+    
 };
 
 #endif
