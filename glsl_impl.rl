@@ -1,6 +1,6 @@
 
 
-#define GLSL_ELSE               9999*0
+//#define GLSL_ELSE               9999*0
 #define GLSL_TOK_TRUE           9998*0
 #define GLSL_TOK_FALSE          9997*0
 #define GLSL_LOWP               9996*0
@@ -222,10 +222,9 @@
 #include <iostream>
 #include <string>
 
-%% write data;
+#include "ParserState.h"
 
-extern Node* result;
-extern bool syntax_error;
+%% write data;
 
 
 class TokenizerContext {
@@ -241,6 +240,7 @@ public:
     char *p; 
     char *pe;
 
+    ParserState ps;
 
 
     size_t tokenLen() {
@@ -252,10 +252,10 @@ public:
             TokenizerContext& tc = *this;
             Token *t = new Token(id, std::string(tok_start, tokenLen()), tc.filename, tc.line, tc.column);
 //            std::cout << "Token accepted : " << *t << std::endl;
-            glslparser(tc.parser, id, t);
+            glslparser(tc.parser, id, t, &ps);
             column += tokenLen();
             tok_start = NULL;
-            if(syntax_error) p = pe; // eww..
+            if(ps.syntax_error) p = pe; // eww..
         }
     }
 
@@ -284,7 +284,8 @@ public:
         %% write init;
         %% write exec;
 
-        glslparser(tc.parser, 0, 0);
+        
+        glslparser(tc.parser, 0, 0, &ps);
 
         if( cs >= glsl_first_final ) {
             printf("Matched\n");
@@ -294,11 +295,11 @@ public:
             printf("stopped at %d, %d\n", line, column );
         }
         
-        if(syntax_error) {
+        if(ps.syntax_error) {
             std::cout << "Syntax error .." << std::endl;
         }
 
-        return result;
+        return ps.result;
     }
 
 

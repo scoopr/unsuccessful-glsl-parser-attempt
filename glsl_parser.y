@@ -8,6 +8,8 @@
 %type unary_operator {Token*}
 %type assignment_operator {Token*}
 
+%extra_argument {ParserState* state}
+
 /*
 Precedence Operator Class Operators Associativity 
 1 (highest) parenthetical grouping ( )       NA 
@@ -64,7 +66,7 @@ Right to Left
 
 
 %syntax_error {
-    syntax_error = true;
+    state->syntax_error = true;
 //    throw std::runtime_error("Syntax terror!")
     if(TOKEN)
         std::cout << "Syntax error on token: " << *TOKEN << std::endl;
@@ -85,15 +87,17 @@ Right to Left
     #include "Token.h"
     #include "glsl.h"
     #include "Node.h"
+    
+    #include "ParserState.h"
 
-    bool syntax_error = false;
-    Node *result = NULL;
+//    bool syntax_error = false;
+//    Node *result = NULL;
 
 }
 
 //program ::= expression(A).   { result = A; }
 //program ::= expression(A).   { result = new Node(A); }
-program ::= translation_unit(A).   { result = A; }
+program ::= translation_unit(A).   { state->result = A; }
 
 
 variable_identifier(A) ::= IDENTIFIER(B). { A = new IdentifierNode(B); }

@@ -12,7 +12,7 @@ TARGET=glsl_examples
 CXXFLAGS += -ggdb -Wall -Wextra  -pedantic
 LDFLAGS +=
 
-SRCS = main.cpp Token.cpp
+SRCS = main.cpp Token.cpp ParserState.cpp
 OBJS = $(SRCS:.cpp=.o) glsl_impl.o glsl_parser.o
 
 
