@@ -83,7 +83,8 @@ Right to Left
     #include <stdio.h>
     #include <string.h>
     #include <stdlib.h>
-    
+    #include <assert.h>   
+
     #include "Token.h"
     #include "glsl.h"
     #include "Node.h"
@@ -164,8 +165,8 @@ additive_expression(A) ::= additive_expression(B) DASH multiplicative_expression
 
 
 shift_expression(A) ::= additive_expression(B) . { A = B; }
-shift_expression(A) ::= shift_expression LEFT_OP additive_expression .
-shift_expression(A) ::= shift_expression RIGHT_OP additive_expression .
+shift_expression ::= shift_expression LEFT_OP additive_expression .
+shift_expression ::= shift_expression RIGHT_OP additive_expression .
 
 
 relational_expression(A) ::= shift_expression(B) . { A = B; }
@@ -180,10 +181,10 @@ equality_expression(A) ::= equality_expression(B) EQ_OP(C) relational_expression
 equality_expression(A) ::= equality_expression(B) NE_OP(C) relational_expression(D) . { A = new EqualityOpNode(B, D, C); }
 
 and_expression(A) ::= equality_expression(B) . { A = B; }
-and_expression(A) ::= and_expression AMPERSAND equality_expression.
+and_expression ::= and_expression AMPERSAND equality_expression.
 
 exclusive_or_expression(A) ::= and_expression(B) . { A = B; }
-exclusive_or_expression(A) ::= exclusive_or_expression CARET and_expression .
+exclusive_or_expression ::= exclusive_or_expression CARET and_expression .
 
 inclusive_or_expression(A) ::= exclusive_or_expression(B) . { A = B; }
 inclusive_or_expression(A) ::= inclusive_or_expression(B) VERTICAL_BAR(C) exclusive_or_expression(D) . { A = new LogicalOpNode(B,D,C); }
@@ -267,10 +268,10 @@ parameter_type_specifier(A) ::= type_specifier(B) . { A = B; }
 
 init_declarator_list(A) ::= single_declaration(B) . { A = B; }
 init_declarator_list(A) ::= init_declarator_list(B) COMMA IDENTIFIER(C) . { A = B; B->addChild(state->identifier(C)); }
-init_declarator_list(A) ::= init_declarator_list(B) COMMA IDENTIFIER(C) LEFT_BRACKET  RIGHT_BRACKET .
-init_declarator_list(A) ::= init_declarator_list(B) COMMA IDENTIFIER(C) LEFT_BRACKET constant_expression(D) RIGHT_BRACKET .
-init_declarator_list(A) ::= init_declarator_list(B) COMMA IDENTIFIER(C) LEFT_BRACKET RIGHT_BRACKET EQUAL initializer(D) .
-init_declarator_list(A) ::= init_declarator_list(B) COMMA IDENTIFIER(C) LEFT_BRACKET constant_expression(D) RIGHT_BRACKET EQUAL initializer(E) .
+init_declarator_list ::= init_declarator_list COMMA IDENTIFIER LEFT_BRACKET  RIGHT_BRACKET .
+init_declarator_list ::= init_declarator_list COMMA IDENTIFIER LEFT_BRACKET constant_expression RIGHT_BRACKET .
+init_declarator_list ::= init_declarator_list COMMA IDENTIFIER LEFT_BRACKET RIGHT_BRACKET EQUAL initializer .
+init_declarator_list ::= init_declarator_list COMMA IDENTIFIER LEFT_BRACKET constant_expression RIGHT_BRACKET EQUAL initializer .
 init_declarator_list(A) ::= init_declarator_list(B) COMMA IDENTIFIER(C) EQUAL initializer(D) . { A = B; IdentifierNode* c = state->identifier(C); c->addChild(D); B->addChild(c); }
 
 
@@ -282,7 +283,7 @@ single_declaration(A) ::= fully_specified_type(B) IDENTIFIER(C) LEFT_BRACKET con
 single_declaration(A) ::= fully_specified_type(B) IDENTIFIER(C) LEFT_BRACKET RIGHT_BRACKET EQUAL initializer(D) . { A = new Node(B, state->identifier(C) ,D); }
 single_declaration(A) ::= fully_specified_type(B) IDENTIFIER(C) LEFT_BRACKET constant_expression(D) RIGHT_BRACKET EQUAL initializer(E) . { A = new Node(B, state->identifier(C), D ,E); }
 single_declaration(A) ::= fully_specified_type(B) IDENTIFIER(C) EQUAL initializer(D) . { A = new Node(B, state->identifier(C),D); }
-single_declaration(A) ::= INVARIANT IDENTIFIER .  // Vertex only. 
+single_declaration ::= INVARIANT IDENTIFIER .  // Vertex only. 
 
 
 fully_specified_type(A) ::= type_specifier(B) . { A = B; }
