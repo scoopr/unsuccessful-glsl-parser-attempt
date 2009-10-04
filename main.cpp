@@ -2,6 +2,7 @@
 #include <iostream>
 #include <stdexcept>
 #include <cstdlib>
+#include <cstdio>
 
 #include "glsl.h"
 
