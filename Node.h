@@ -53,6 +53,8 @@ public:
             delete *i;
         }
         children.clear();
+        
+        delete terminal;
     }
     
     
