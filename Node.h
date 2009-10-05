@@ -205,4 +205,5 @@ public:
     std::string getNodeName() const { return "IterationNode"; }
 };
 
-#endif LANG_NODE_H
+#endif
+
