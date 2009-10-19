@@ -73,8 +73,6 @@ clean:
 Node.o: Node.h Token.h
 ParserState.o: ParserState.h Node.h Token.h
 Token.o: Token.h
-glsl_impl.o: glsl.h glsl_parser.h Token.h Node.h ParserState.h
-glsl_parser.o: Token.h glsl.h glsl_parser.h Node.h ParserState.h
-main.o: glsl.h glsl_parser.h Token.h Node.h
+main.o: glsl.h Token.h Node.h
 spec/spec.o: spec/spec.h
 spec/spec_main.o: spec/spec.h
