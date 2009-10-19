@@ -7,14 +7,44 @@
 
 #include "Token.h"
 
+
+typedef const char* NodeType;
+
+static NodeType NODE_FLOAT = "FloatNode";
+static NodeType NODE_INT = "IntNode";
+static NodeType NODE_IDENTIFIER = "IdentifierNode";
+static NodeType NODE_ARRAYINDEX = "ArrayIndexNode";
+static NodeType NODE_PARAMETERDECLARATION = "ParameterDeclarationNode";
+static NodeType NODE_TYPE = "TypeNode";
+static NodeType NODE_MULTIPLICATION = "MultiplicationNode";
+static NodeType NODE_ADDITION = "AdditionNode";
+static NodeType NODE_CALL = "CallNode";
+static NodeType NODE_ASSIGN = "AssignNode";
+static NodeType NODE_SELECTION = "SelectionNode";
+static NodeType NODE_RELATION = "RelationalNode";
+static NodeType NODE_FUNCTIONDECLARATION = "FunctionDeclarationNode";
+static NodeType NODE_LOGICALOP = "LogicalOpNode";
+static NodeType NODE_EQUALITYOP = "EqualityOpNode";
+static NodeType NODE_ITERATION = "IterationNode";
+
+
+
 static inline void indent(std::ostream& os, int depth) {
     for(int i = 0; i < depth; ++i) { os << " "; }    
 }
 
 
+class Node;
+
+class NodeVisitor {
+public:
+    virtual void visit(Node* n) = 0;
+};
+
+
 class Node {
 public:
-
+    
 
     Node() : terminal(NULL) {}
     Node(Token* term) : terminal(term) {}
@@ -62,12 +92,13 @@ public:
 
     std::vector<Node*> children;
 
-    virtual std::string getNodeName() const { return "Node"; }
+    virtual NodeType getNodeType() const { return "Node"; }
 //    virtual const std::string& inspect() const { return ""; }
 
     std::ostream& dumpTree(std::ostream& os, int depth = 0) {
         indent(os,depth);
-        os << getNodeName() << " " ;
+        std::string t = getNodeType();
+        os << t << " " ;
         if(terminal) {
             os << "[" << terminal->string << "] ";
         }
@@ -92,39 +123,41 @@ public:
         
         return os;
     }
+    
 
 };
+
 
 
 class NotImplementedNode : public Node {
 public:
     NotImplementedNode() : Node((Token*)NULL) {}
-    std::string getNodeName() const { return "NotImplementedNode"; }
+    NodeType getNodeType() const { return  "NotImplementedNode" ; }
 };
 
 class FloatNode : public Node {
 public:
     FloatNode(Token* t) : Node(t) {}
-    std::string getNodeName() const { return "FloatNode"; }
+    NodeType getNodeType() const { return NODE_FLOAT; }
 };
 
 class IntNode : public Node {
 public:
     IntNode(Token* t) : Node(t) {}
-    std::string getNodeName() const { return "IntNode"; }
+    NodeType getNodeType() const { return NODE_INT; }
 };
 
 class IdentifierNode : public Node {
 public:
     IdentifierNode(Token* t) : Node(t) {}
-    std::string getNodeName() const { return "IdentifierNode"; }
+    NodeType getNodeType() const { return NODE_IDENTIFIER; }
 };
 
 class ArrayIndexNode : public Node {
 public:
     ArrayIndexNode(Node *ary, Node *index) : Node(ary, index) {
     }
-    std::string getNodeName() const { return "ArrayIndexNode"; }
+    NodeType getNodeType() const { return  NODE_ARRAYINDEX ; }
 };
 
 class ParameterDeclarationNode : public Node {
@@ -133,76 +166,76 @@ public:
     }
     ParameterDeclarationNode(Node *t1, Node *t2, Node *t3) :Node(t1,t2,t3)  {
     }
-    std::string getNodeName() const { return "ParameterDeclarationNode"; }
+    NodeType getNodeType() const { return  NODE_PARAMETERDECLARATION ; }
     
 };
 
 class TypeNode : public Node {
 public:
     TypeNode(Token* t) : Node(t) {  }
-    std::string getNodeName() const { return "TypeNode"; }
+    NodeType getNodeType() const { return  NODE_TYPE ; }
 };
 
 class MultiplicationNode : public Node {    
 public:
     MultiplicationNode(Node* left, Node* right) : Node(left,right) {  }
-    std::string getNodeName() const { return "MultiplicationNode"; }
+    NodeType getNodeType() const { return  NODE_MULTIPLICATION ; }
 };
 
 class AdditionNode : public Node {    
 public:
     AdditionNode(Node* left, Node* right) : Node(left,right) {  }
-    std::string getNodeName() const { return "AdditionNode"; }
+    NodeType getNodeType() const { return  NODE_ADDITION ; }
 };
 
 class CallNode : public Node {    
 public:
     CallNode(Node* n1, Node* n2) : Node(n1,n2) {  }
-    std::string getNodeName() const { return "CallNode"; }
+    NodeType getNodeType() const { return  NODE_CALL ; }
 };
 
 class AssignNode : public Node {
 public:
     AssignNode(Node* n1, Node* n2, Token *assignop) : Node(n1,n2) { terminal = assignop;  }
-    std::string getNodeName() const { return "AssignNode"; }    
+    NodeType getNodeType() const { return  NODE_ASSIGN ; }    
 };
 
 class SelectionNode : public Node {
 public:
     SelectionNode(Node* expr, Node *then, Node *otherwise) : Node(expr,then,otherwise) {}
     SelectionNode(Node* expr, Node *then) : Node(expr,then) {}
-    std::string getNodeName() const { return "SelectionNode"; }    
+    NodeType getNodeType() const { return  NODE_SELECTION ; }    
 };
 
 class RelationalNode : public Node {
 public:
     RelationalNode(Node* n1, Node* n2, Token *relationop) : Node(n1,n2) { terminal = relationop;  }
-    std::string getNodeName() const { return "RelationalNode"; }    
+    NodeType getNodeType() const { return  NODE_RELATION ; }    
 };
 
 class FunctionDeclarationNode : public Node {
 public:
     FunctionDeclarationNode(Node* n1, Node *n2) : Node(n1,n2) {  }
-    std::string getNodeName() const { return "FunctionDeclarationNode"; }
+    NodeType getNodeType() const { return  NODE_FUNCTIONDECLARATION ; }
 };
 
 class LogicalOpNode : public Node {
 public:
     LogicalOpNode(Node *n1, Node *n2, Token *op) : Node(n1,n2) { terminal = op; }
-    std::string getNodeName() const { return "LogicalOpNode"; }
+    NodeType getNodeType() const { return  NODE_LOGICALOP ; }
 };
 
 class EqualityOpNode : public Node {
 public:
     EqualityOpNode(Node *n1, Node *n2, Token *op) : Node(n1,n2) { terminal = op; }
-    std::string getNodeName() const { return "EqualityOpNode"; }
+    NodeType getNodeType() const { return  NODE_EQUALITYOP ; }
 };
 
 class IterationNode : public Node {
 public:
     IterationNode(Node *init, Node *expr, Node *stmt) : Node(init,expr,stmt) {}
     IterationNode(Node *expr, Node *stmt) : Node(expr,stmt) {}
-    std::string getNodeName() const { return "IterationNode"; }
+    NodeType getNodeType() const { return  NODE_ITERATION ; }
 };
 
 #endif
