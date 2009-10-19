@@ -315,7 +315,7 @@ Node* glsl_parse(void* parser, char *p, char *pe, const std::string& filename) {
     return tc.glsl_parse(filename);
 }
 
-
+#include <cstring>
 Node* glsl_parseString(const char* str) {
     void* pglslparser = glslparserAlloc (malloc);
     char* p = const_cast<char*>(str);

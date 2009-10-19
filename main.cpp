@@ -6,7 +6,7 @@
 
 #include "libglsl/glsl.h"
 
-
+#include <cstring>
 
 
 
