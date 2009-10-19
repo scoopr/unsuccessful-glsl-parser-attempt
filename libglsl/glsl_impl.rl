@@ -315,3 +315,41 @@ Node* glsl_parse(void* parser, char *p, char *pe, const std::string& filename) {
     return tc.glsl_parse(filename);
 }
 
+
+Node* glsl_parseString(const char* str) {
+    void* pglslparser = glslparserAlloc (malloc);
+    char* p = const_cast<char*>(str);
+    char* pe = const_cast<char*>(str) + strlen(str);
+    
+    Node *tree = glsl_parse(pglslparser, p, pe, "(eval)");
+    glslparserFree(pglslparser, free );
+
+    return tree;
+}
+
+#include <stdexcept>
+Node* glsl_parseFile(const char* fn) {
+    FILE *f = fopen(fn, "r");
+    if(!f) { throw std::runtime_error("Could not open file"); }
+    fseek(f, 0, SEEK_END);
+
+    off_t size = ftello(f);
+    fseek(f, 0, SEEK_SET);
+
+
+    char *p = static_cast<char*>(malloc(size));
+    fread(p,size,1,f);
+    char *pe = p + size;
+    fclose(f);
+
+    void* pglslparser = glslparserAlloc (malloc);
+
+    Node *tree = glsl_parse(pglslparser, p, pe, fn);
+
+    glslparserFree(pglslparser, free );
+
+    free(p);
+    return tree;
+}
+
+

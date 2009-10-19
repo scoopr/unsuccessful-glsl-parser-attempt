@@ -18,22 +18,14 @@ int main(int argc, char **argv) {
 
     if ( argc > 1 ) { 
 
-        FILE *f = fopen(argv[1], "r");
-        if(!f) { throw std::runtime_error("Could not open file"); }
-        fseek(f, 0, SEEK_END);
+        Node* tree = NULL;
+        
+        if(argc>2 && strcmp(argv[1], "-e") == 0 ) {
+            tree = glsl_parseString(argv[2]);
+        } else {
+            tree = glsl_parseFile(argv[1]);
+        }
 
-        off_t size = ftello(f);
-        fseek(f, 0, SEEK_SET);
-
-
-        char *p = static_cast<char*>(malloc(size));
-        fread(p,size,1,f);
-        char *pe = p + size;
-        fclose(f);
-
-        void* pglslparser = glslparserAlloc (malloc);
-
-        Node *tree = glsl_parse(pglslparser, p, pe, argv[1]);
 
         if(tree) {
             tree->dumpTree(std::cout);
@@ -41,10 +33,6 @@ int main(int argc, char **argv) {
             std::cerr << "No tree?" << std::endl; 
             retval = EXIT_FAILURE;
         }
-
-        glslparserFree(pglslparser, free );
-
-        free(p);
         
         delete tree;
 

@@ -9,9 +9,9 @@ RAGEL=ragel
 LEMON=lemon
 
 TARGET=glsl_examples
-
-CXXFLAGS += -ggdb -Wall -Wextra  -pedantic
-LDFLAGS +=
+ARCH=
+CXXFLAGS += -ggdb -Wall -Wextra  -pedantic $(ARCH)
+LDFLAGS += $(ARCH)
 
 MAIN_SRCS = main.cpp
 MAIN_OBJS = main.o
@@ -25,7 +25,7 @@ RESULT_IM = $(EXAMPLES:.frag=.fout)
 RESULT = $(RESULT_IM:.vert=.vout)
 
 
-all: spec
+all: spec glsl
 # $(TARGET)
 
 spec: specsuite
@@ -51,7 +51,7 @@ glsl: $(MAIN_OBJS) $(GLSL_OBJS)
 
 %.cpp: %.y
 	@echo GEN PARSER $<
-	$(LEMON) $<
+	@$(LEMON) $<
 	mv $(subst .y,.c,$<) $@
 
 glsl_examples: glsl $(RESULT)
@@ -76,7 +76,7 @@ libglsl/glsl.h: libglsl/glsl_parser.h
 libglsl/glsl_parser.o: CXXFLAGS+=-Wno-unused -Wno-sign-compare
 
 clean:
-	$(RM) $(MAIN_OBJS) $(GLSL_OBJS) $(SPEC_OBJS) libglsl/glsl_impl.cpp glsl $(TARGET)  libglsl/glsl_parser.cpp libglsl/glsl_parser.h libglsl/glsl_parser.out $(RESULT)
+	$(RM) $(MAIN_OBJS) $(GLSL_OBJS) $(SPEC_OBJS) libglsl/glsl_impl.cpp glsl specsuite  libglsl/glsl_parser.cpp libglsl/glsl_parser.h libglsl/glsl_parser.out $(RESULT)
 
 
 # DO NOT DELETE

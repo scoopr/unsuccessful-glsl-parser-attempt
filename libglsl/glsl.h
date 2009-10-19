@@ -21,7 +21,8 @@ void glslparserTrace(FILE *TraceFILE, char *zTracePrompt);
 class Node;
 
 Node* glsl_parse(void* parser, char *p, char *pe, const std::string& filename);
-
+Node* glsl_parseString(const char* str);
+Node* glsl_parseFile(const char* fn);
 
 #endif
 
