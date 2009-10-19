@@ -5,3 +5,4 @@ glsl_impl.cpp
 glsl_parser.h
 glsl_parser.cpp
 glsl_parser.out
+specsuite
