@@ -4,7 +4,7 @@
 #include <cstdlib>
 #include <cstdio>
 
-#include "glsl.h"
+#include "libglsl/glsl.h"
 
 
 
@@ -45,6 +45,8 @@ int main(int argc, char **argv) {
         glslparserFree(pglslparser, free );
 
         free(p);
+        
+        delete tree;
 
 
     } 
