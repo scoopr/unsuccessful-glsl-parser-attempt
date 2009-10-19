@@ -52,7 +52,7 @@ glsl_examples: glsl $(RESULT)
 
 $(EXAMPLES): glsl
 
-depend:
+depend: clean
 	@echo DEP
 	@makedepend -Y -- $(CXXFLAGS) -- $(SRCS) $(SPEC_SRC)  > /dev/null 2>&1 
 	@$(RM) Makefile.bak
