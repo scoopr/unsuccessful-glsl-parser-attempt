@@ -63,10 +63,13 @@ public:
     std::ostream& os;
     CodeDumper(std::ostream& os_) : os(os_) {} 
     void visit(Node* n) {
-        if(n->getNodeType() == NODE_FUNCTIONDECLARATION) {
-            os << n->children[0]->terminal->string << " " << n->children[1]->terminal->string << "()";
+        
+        FunctionDeclarationNode* fn = node_cast<FunctionDeclarationNode>(n);
+        
+        if(fn) {
+            os << fn->getReturnType() << " " << fn->getName() << "()";
             os << "{";
-            n->children[ n->children.size() -1 ]->traverse(*this);
+            fn->getBody()->traverse(*this);
             os << "}";
         } else {
 

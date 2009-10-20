@@ -32,6 +32,7 @@ static NodeType NODE_ITERATION = "IterationNode";
 
 class Node;
 
+
 class NodeVisitor {
 public:
     virtual void visit(Node* n) = 0;
@@ -194,6 +195,9 @@ class FunctionDeclarationNode : public Node {
 public:
     FunctionDeclarationNode(Node* n1, Node *n2) : Node(n1,n2) {  }
     NodeType getNodeType() const { return  NODE_FUNCTIONDECLARATION ; }
+    const std::string& getReturnType() { return children[0]->terminal->string; }
+    const std::string& getName() { return children[1]->terminal->string; }
+    Node* getBody() { return children[2]; }
 };
 
 class LogicalOpNode : public Node {
@@ -214,6 +218,17 @@ public:
     IterationNode(Node *expr, Node *stmt) : Node(expr,stmt) {}
     NodeType getNodeType() const { return  NODE_ITERATION ; }
 };
+
+
+template<class T> NodeType node_type() {
+    return  ((T*)NULL ) ->T::getNodeType(); 
+}
+
+template<class T> T* node_cast(Node* f) { 
+    if( node_type<T>() != f->getNodeType()) return NULL;  
+    return reinterpret_cast<T*>(f); 
+}
+
 
 #endif
 
