@@ -29,10 +29,6 @@ static NodeType NODE_ITERATION = "IterationNode";
 
 
 
-static inline void indent(std::ostream& os, int depth) {
-    for(int i = 0; i < depth; ++i) { os << " "; }    
-}
-
 
 class Node;
 
@@ -93,37 +89,18 @@ public:
     std::vector<Node*> children;
 
     virtual NodeType getNodeType() const { return "Node"; }
-//    virtual const std::string& inspect() const { return ""; }
 
-    std::ostream& dumpTree(std::ostream& os, int depth = 0) {
-        indent(os,depth);
-        std::string t = getNodeType();
-        os << t << " " ;
-        if(terminal) {
-            os << "[" << terminal->string << "] ";
-        }
-        
+
+    void traverse(NodeVisitor& nv) {
+
         std::vector<Node*>::iterator i = children.begin(), itEnd = children.end();
-        if( i!= itEnd) {
-            os << "{" << std::endl;
-            
-            for(; i != itEnd; ++i)
-            {
-                if(*i) {
-                    (*i)->dumpTree(os, depth+1);                    
-                } else {
-                    indent(os,depth+1);
-                    os << "(null node)" << std::endl;
-                }
-            }
-            indent(os,depth);
-            os << "}" ;
-        }
-        os << std::endl;
         
-        return os;
+        for(; i != itEnd; ++i)
+        {
+            nv.visit(*i);
+        }
+        
     }
-    
 
 };
 
