@@ -220,6 +220,7 @@ public:
 };
 
 
+
 template<class T> NodeType node_type() {
     return  ((T*)NULL ) ->T::getNodeType(); 
 }

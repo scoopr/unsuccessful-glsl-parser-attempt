@@ -288,7 +288,7 @@ public:
         glslparser(tc.parser, 0, 0, &ps);
 
         if( cs >= glsl_first_final ) {
-            printf("Matched\n");
+//            printf("Matched\n");
         } else if(cs == glsl_error ){
             printf("Parse error at line %d, column %d\n", line, column);
         } else {

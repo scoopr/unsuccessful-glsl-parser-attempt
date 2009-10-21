@@ -85,6 +85,7 @@ main.o: libglsl/glsl.h libglsl/Token.h libglsl/Node.h
 libglsl/Node.o: libglsl/Node.h libglsl/Token.h
 libglsl/ParserState.o: libglsl/ParserState.h libglsl/Node.h libglsl/Token.h
 libglsl/Token.o: libglsl/Token.h
-spec/glsl_spec.o: spec/spec.h
+spec/glsl_spec.o: spec/spec_helper.h spec/spec.h libglsl/glsl.h
+spec/glsl_spec.o: libglsl/Token.h libglsl/Node.h
 spec/spec.o: spec/spec.h
 spec/spec_main.o: spec/spec.h

@@ -106,6 +106,7 @@ int main(int argc, char **argv) {
             std::cout << "Code:" << std::endl;
             CodeDumper cd(std::cout);
             cd.visit(tree);
+            std::cout << std::endl;
         } else { 
             std::cerr << "No tree?" << std::endl; 
             retval = EXIT_FAILURE;
