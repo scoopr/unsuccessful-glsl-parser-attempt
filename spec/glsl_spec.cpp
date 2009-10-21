@@ -8,23 +8,37 @@ describe(glsl, "function") {
                          s(NODE_FUNCTIONDECLARATION,
                            s(NODE_TYPE, std::string("void")),
                            s(NODE_IDENTIFIER, std::string("f")), 
-                           any() 
+                           any_tree() 
                           )
                         );
     }
 
-    it("should parse function with variable declaration") {
-        should_equal_ast("void f(){ int a; }", 
-                         s(NODE_FUNCTIONDECLARATION,
-                           s(NODE_TYPE, std::string("void")),
-                           s(NODE_IDENTIFIER, std::string("f")), 
-                           s("Node",
-                             s("Node",
-                               s(NODE_TYPE, std::string("int")),
-                               s(NODE_IDENTIFIER, std::string("a"))
-                             )) 
-                          )
-                        );
-    }
     
 }
+
+
+describe(glsl, "variables in function context") {
+
+    it("should parse int declaration") {
+        should_equal_function_ast("int a;", 
+                             s(NODE_ANY,
+                               s(NODE_TYPE, std::string("int")),
+                               s(NODE_IDENTIFIER, std::string("a"))
+                             )
+                        );
+    }
+
+
+    it("should parse int declaration with initializer") {
+        should_equal_function_ast("int a = 42;", 
+                             s(NODE_ANY,
+                               s(NODE_TYPE, std::string("int")),
+                               s(NODE_IDENTIFIER, std::string("a")),
+                               s(NODE_INT, std::string("42"))
+                             )
+                        );
+    }
+
+    
+}
+
