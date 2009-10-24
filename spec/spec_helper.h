@@ -3,6 +3,7 @@
 
 #include "spec.h"
 #include "../libglsl/glsl.h"
+#include <cstdio>
 
 static NodeType NODE_ANY;
 
