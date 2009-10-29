@@ -10,22 +10,22 @@
 
 typedef const char* NodeType;
 
-static NodeType NODE_FLOAT = "FloatNode";
-static NodeType NODE_INT = "IntNode";
-static NodeType NODE_IDENTIFIER = "IdentifierNode";
-static NodeType NODE_ARRAYINDEX = "ArrayIndexNode";
-static NodeType NODE_PARAMETERDECLARATION = "ParameterDeclarationNode";
-static NodeType NODE_TYPE = "TypeNode";
-static NodeType NODE_MULTIPLICATION = "MultiplicationNode";
-static NodeType NODE_ADDITION = "AdditionNode";
-static NodeType NODE_CALL = "CallNode";
-static NodeType NODE_ASSIGN = "AssignNode";
-static NodeType NODE_SELECTION = "SelectionNode";
-static NodeType NODE_RELATION = "RelationalNode";
-static NodeType NODE_FUNCTIONDECLARATION = "FunctionDeclarationNode";
-static NodeType NODE_LOGICALOP = "LogicalOpNode";
-static NodeType NODE_EQUALITYOP = "EqualityOpNode";
-static NodeType NODE_ITERATION = "IterationNode";
+extern NodeType NODE_FLOAT;
+extern NodeType NODE_INT;
+extern NodeType NODE_IDENTIFIER;
+extern NodeType NODE_ARRAYINDEX;
+extern NodeType NODE_PARAMETERDECLARATION;
+extern NodeType NODE_TYPE;
+extern NodeType NODE_MULTIPLICATION;
+extern NodeType NODE_ADDITION;
+extern NodeType NODE_CALL;
+extern NodeType NODE_ASSIGN;
+extern NodeType NODE_SELECTION;
+extern NodeType NODE_RELATION;
+extern NodeType NODE_FUNCTIONDECLARATION;
+extern NodeType NODE_LOGICALOP;
+extern NodeType NODE_EQUALITYOP;
+extern NodeType NODE_ITERATION;
 
 
 
