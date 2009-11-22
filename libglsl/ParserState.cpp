@@ -3,6 +3,6 @@
 #include "Node.h"
 
 
-IdentifierNode* ParserState::identifier(Token* token) {
-    return new IdentifierNode(token);
+Node* ParserState::identifier(Token* token) {
+    return s(NODE_IDENTIFIER, token);
 }

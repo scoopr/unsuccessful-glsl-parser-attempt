@@ -16,7 +16,7 @@ public:
     bool syntax_error;
     Node* result;
     
-    IdentifierNode* identifier(Token* token);
+    Node* identifier(Token* token);
     
 };
 
