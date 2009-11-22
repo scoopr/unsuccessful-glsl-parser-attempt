@@ -120,7 +120,7 @@ public:
         std::vector<Node*>::const_iterator oi = other.children.begin(), oitEnd = other.children.end();
         for(; i != itEnd || oi != oitEnd; ++i, ++oi)
         {
-            if( *i != *oi ) return false;
+            if( *(*i) != *(*oi) ) return false;
         }
 
         return true;
@@ -149,7 +149,7 @@ public:
 class NotImplementedNode : public Node {
 public:
 //    NotImplementedNode() : Node((Token*)NULL) {}
-    NodeType getNodeType() const { return  "NotImplementedNode" ; }
+    NodeType getNodeType() const { return  NODE_NOTIMPLEMENTED ; }
 };
 
 class AnyNode : public Node {
@@ -166,7 +166,7 @@ public:
         std::vector<Node*>::const_iterator oi = other.children.begin(), oitEnd = other.children.end();
         for(; i != itEnd || oi != oitEnd; ++i, ++oi)
         {
-            if( *i != *oi ) return false;
+            if( *(*i) != *(*oi) ) return false;
         }
 
         return true;

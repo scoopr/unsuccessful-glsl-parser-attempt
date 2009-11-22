@@ -3,14 +3,13 @@
 
 
 std::ostream& operator<<(std::ostream& os, const Node& n) {
-    os << n.getNodeType();
-    if(n.terminal) os << "[" << n.terminal->string << "]";
+    os << "s(" << n.getNodeType();
+    if(n.terminal) os << ", token(\"" << n.terminal->string << "\")";
     
-    os << "( ";
     std::vector<Node*>::const_iterator i = n.children.begin(), itEnd = n.children.end();
     for(; i != itEnd; ++i)
     {
-        os << *i << ", ";
+        os << ", " << *(*i) << "\n";
         
     }
     os << ")";
@@ -33,9 +32,10 @@ describe(glsl_ast, "nodes") {
         should_equal(*n2, *n1);
         should_equal(*n2, *n2);
     }
-
     
 }
+
+
 
 describe(glsl, "function") {
     
@@ -51,6 +51,7 @@ describe(glsl, "function") {
 
     
 }
+
 
 
 describe(glsl, "variables in function context") {

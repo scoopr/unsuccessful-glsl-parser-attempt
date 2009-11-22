@@ -15,22 +15,8 @@ Node* any_tree() { AnyNode *r = new AnyNode; r->recursive = true; return r; }
 
 
 static void should_equal_ast__rec(specific::SpecBase *sb, Node* n, Node *cn, const char *file, int line, int depth=0) {
-    
-    AnyNode* anyNode = node_cast<AnyNode>(cn);
-    if(anyNode && anyNode->recursive) return;
 
-    
-    if(cn->getNodeType() != NODE_ANY) {
-        sb->should_equal_template( n->getNodeType(), cn->getNodeType(), file, line);        
-    }
-
-    if(cn->terminal && cn->terminal->string.size() > 0) {
-        sb->should_equal_template( n->terminal->string, cn->terminal->string , file, line);
-    }
-    
-    char tmp[256];
-    snprintf(tmp,255,"differing vector size at depth %d on node %s", depth, n->getNodeType());
-    sb->should_equal_template( n->children.size(), cn->children.size(), file, line, tmp);
+    sb->should_equal_template( *n, *cn, file, line);
 
     std::vector<Node*>::iterator i = n->children.begin(), iEnd = n->children.end();
     std::vector<Node*>::iterator ci = cn->children.begin(), ciEnd = cn->children.end();

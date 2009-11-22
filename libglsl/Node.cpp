@@ -2,25 +2,25 @@
 
 typedef const char* NodeType;
 
-NodeType NODE_NOTIMPLEMENTED = "NotImplementedNode";
-NodeType NODE_ANY = "AnyNode";
+NodeType NODE_NOTIMPLEMENTED = "NODE_NOTIMPLEMENTED";
+NodeType NODE_ANY = "NODE_ANY";
 
-NodeType NODE_FLOAT = "FloatNode";
-NodeType NODE_INT = "IntNode";
-NodeType NODE_IDENTIFIER = "IdentifierNode";
-NodeType NODE_ARRAYINDEX = "ArrayIndexNode";
-NodeType NODE_PARAMETERDECLARATION = "ParameterDeclarationNode";
-NodeType NODE_TYPE = "TypeNode";
-NodeType NODE_MULTIPLICATION = "MultiplicationNode";
-NodeType NODE_ADDITION = "AdditionNode";
-NodeType NODE_CALL = "CallNode";
-NodeType NODE_ASSIGN = "AssignNode";
-NodeType NODE_SELECTION = "SelectionNode";
-NodeType NODE_RELATION = "RelationalNode";
-NodeType NODE_FUNCTIONDECLARATION = "FunctionDeclarationNode";
-NodeType NODE_LOGICALOP = "LogicalOpNode";
-NodeType NODE_EQUALITYOP = "EqualityOpNode";
-NodeType NODE_ITERATION = "IterationNode";
+NodeType NODE_FLOAT = "NODE_FLOAT";
+NodeType NODE_INT = "NODE_INT";
+NodeType NODE_IDENTIFIER = "NODE_IDENTIFIER";
+NodeType NODE_ARRAYINDEX = "NODE_ARRAYINDEX";
+NodeType NODE_PARAMETERDECLARATION = "NODE_PARAMETERDECLARATION";
+NodeType NODE_TYPE = "NODE_TYPE";
+NodeType NODE_MULTIPLICATION = "NODE_MULTIPLICATION";
+NodeType NODE_ADDITION = "NODE_ADDITION";
+NodeType NODE_CALL = "NODE_CALL";
+NodeType NODE_ASSIGN = "NODE_ASSIGN";
+NodeType NODE_SELECTION = "NODE_SELECTION";
+NodeType NODE_RELATION = "NODE_RELATION";
+NodeType NODE_FUNCTIONDECLARATION = "NODE_FUNCTIONDECLARATION";
+NodeType NODE_LOGICALOP = "NODE_LOGICALOP";
+NodeType NODE_EQUALITYOP = "NODE_EQUALITYOP";
+NodeType NODE_ITERATION = "NODE_ITERATION";
 
 
 Node* createNode(NodeType type) {
