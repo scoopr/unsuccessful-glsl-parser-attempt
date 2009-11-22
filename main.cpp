@@ -27,32 +27,42 @@ public:
     
     void visit(Node *n) {
 
-
         if(n == NULL) {
             indent(depth+1);
             os << "(null node)" << std::endl;
             return;
         }
 
-        indent();
+//        indent();
         std::string t = n->getNodeType();
-        os << t << " " ;
+        os << "s(" << t ;
         if(n->terminal) {
-            os << "[" << n->terminal->string << "] ";
+            os << ", token(\"" << n->terminal->string << "\")";
         }
 
         if( n->children.size() > 0 ) {
-            os << "{" << std::endl;
-            depth++;
-            n->traverse(*this);
-            depth--;
+            depth+=2;
+//            n->traverse(*this);
+            
+            std::vector<Node*>::iterator i = n->children.begin(), itEnd = n->children.end();
+
+            for(; i != itEnd; ++i)
+            {
+                os << ", \n";
+                indent();
+                visit(*i);
+            }
+
+            depth-=2;
+            os << "\n";
             indent();
-            os << "}" << std::endl;
+            os << ")";
         } else {
-            os << std::endl;
+            os << ")";
         }
         
 
+        if(depth==0) os << ";\n";
     }
 
 };
@@ -63,7 +73,7 @@ public:
     std::ostream& os;
     CodeDumper(std::ostream& os_) : os(os_) {} 
     void visit(Node* n) {
-        
+        if(!n) { std::cout << "Warning: NULL!" << std::endl; return; }
         FunctionDeclarationNode* fn = node_cast<FunctionDeclarationNode>(n);
         
         if(fn) {
@@ -105,7 +115,7 @@ int main(int argc, char **argv) {
             d.visit(tree);
             std::cout << "Code:" << std::endl;
             CodeDumper cd(std::cout);
-            cd.visit(tree);
+//            cd.visit(tree);
             std::cout << std::endl;
         } else { 
             std::cerr << "No tree?" << std::endl; 
