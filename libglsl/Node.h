@@ -106,6 +106,30 @@ public:
 
     virtual NodeType getNodeType() const { return "Node"; }
 
+    virtual bool operator==(const Node& other) const {
+
+        // Too lazy to do proper doubledispatch
+        if( other.getNodeType() == NODE_ANY ) return other == *this;
+
+        if( !!terminal != !!other.terminal) return false;
+        if(terminal && other.terminal && *terminal != *other.terminal) return false;
+
+        if(children.size() != other.children.size()) return false;
+
+        std::vector<Node*>::const_iterator i = children.begin(), itEnd = children.end();
+        std::vector<Node*>::const_iterator oi = other.children.begin(), oitEnd = other.children.end();
+        for(; i != itEnd || oi != oitEnd; ++i, ++oi)
+        {
+            if( *i != *oi ) return false;
+        }
+
+        return true;
+    }
+    
+    virtual bool operator!=(const Node& other) const {
+        return !(*this == other);
+    }
+
 
     void traverse(NodeVisitor& nv) {
 
@@ -130,9 +154,25 @@ public:
 
 class AnyNode : public Node {
 public:
-    AnyNode() : anytree(false) {}
+    AnyNode() : recursive(false) {}
     NodeType getNodeType() const { return NODE_ANY; }
-    bool anytree;
+    bool recursive;
+
+    virtual bool operator==(const Node& other) const {
+
+        if(recursive) return true;
+
+        std::vector<Node*>::const_iterator i = children.begin(), itEnd = children.end();
+        std::vector<Node*>::const_iterator oi = other.children.begin(), oitEnd = other.children.end();
+        for(; i != itEnd || oi != oitEnd; ++i, ++oi)
+        {
+            if( *i != *oi ) return false;
+        }
+
+        return true;
+    }
+
+
 };
 
 
@@ -248,7 +288,6 @@ public:
 
 
 Node* createNode(NodeType type);
-
 
 
 static inline Node* s(NodeType type) { return createNode(type); }

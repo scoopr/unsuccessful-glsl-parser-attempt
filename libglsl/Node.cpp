@@ -1,5 +1,6 @@
 #include "Node.h"
 
+typedef const char* NodeType;
 
 NodeType NODE_NOTIMPLEMENTED = "NotImplementedNode";
 NodeType NODE_ANY = "AnyNode";

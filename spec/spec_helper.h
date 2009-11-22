@@ -7,7 +7,7 @@
 
 
 
-Node* any_tree() { AnyNode *r = new AnyNode; r->anytree = true; return r; }
+Node* any_tree() { AnyNode *r = new AnyNode; r->recursive = true; return r; }
 
 
 #define should_equal_ast(n,cn) should_equal_ast_(this, n, cn, __FILE__, __LINE__)
@@ -17,8 +17,8 @@ Node* any_tree() { AnyNode *r = new AnyNode; r->anytree = true; return r; }
 static void should_equal_ast__rec(specific::SpecBase *sb, Node* n, Node *cn, const char *file, int line, int depth=0) {
     
     AnyNode* anyNode = node_cast<AnyNode>(cn);
-    if(anyNode && anyNode->anytree) return;
-//    if(cn->any) { return; }
+    if(anyNode && anyNode->recursive) return;
+
     
     if(cn->getNodeType() != NODE_ANY) {
         sb->should_equal_template( n->getNodeType(), cn->getNodeType(), file, line);        
@@ -51,8 +51,8 @@ static void should_equal_ast_(specific::SpecBase *sb, const char* str, Node *cn,
 static void should_equal_function_ast_(specific::SpecBase *sb, const char* str, Node *cn, const char *file, int line) {
 
     Node *cnn = s(NODE_FUNCTIONDECLARATION,
-      s(NODE_TYPE, new Token("void")),
-      s(NODE_IDENTIFIER, new Token("f")), s(NODE_ANY,cn) ) ;
+      s(NODE_TYPE, token("void")),
+      s(NODE_IDENTIFIER, token("f")), s(NODE_ANY,cn) ) ;
 
     std::string fn = std::string("void f() {") + str + "}";
     should_equal_ast_(sb, fn.c_str(), cnn, file, line);

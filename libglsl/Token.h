@@ -19,9 +19,20 @@ public:
     std::string file;
     int line;
     int column;
+    
+    
+    bool operator==(const Token& other) const {
+        return string == other.string;
+    }
+
+    bool operator!=(const Token& other) const {
+        return !(*this == other);
+    }
 
 };
 
+
+#define token(x) new Token(-1, x, __FILE__, __LINE__, 0)
 
 std::ostream& operator<<(std::ostream& os, const Token& token);
 
