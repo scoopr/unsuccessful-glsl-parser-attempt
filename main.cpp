@@ -79,7 +79,9 @@ public:
         if(fn) {
             os << fn->getReturnType() << " " << fn->getName() << "()";
             os << "{";
-            fn->getBody()->traverse(*this);
+            if(fn->getBody()) {
+                fn->getBody()->traverse(*this);
+            } else { std::cout << "Warning: NULL FunctionDeclarationNode" << std::endl; }
             os << "}";
         } else {
 
@@ -115,7 +117,7 @@ int main(int argc, char **argv) {
             d.visit(tree);
             std::cout << "Code:" << std::endl;
             CodeDumper cd(std::cout);
-//            cd.visit(tree);
+            cd.visit(tree);
             std::cout << std::endl;
         } else { 
             std::cerr << "No tree?" << std::endl; 
