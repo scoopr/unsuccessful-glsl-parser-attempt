@@ -31,7 +31,7 @@ extern NodeType NODE_EQUALITYOP;
 extern NodeType NODE_ITERATION;
 
 
-
+const std::string UNDEFINED="<undefined>";
 
 class Node;
 
@@ -261,9 +261,9 @@ class FunctionDeclarationNode : public Node {
 public:
     // FunctionDeclarationNode(Node* n1, Node *n2) : Node(n1,n2) {  }
     NodeType getNodeType() const { return  NODE_FUNCTIONDECLARATION ; }
-    const std::string& getReturnType() { return children[0]->terminal->string; }
-    const std::string& getName() { return children[1]->terminal->string; }
-    Node* getBody() { return children[2]; }
+    const std::string& getReturnType() { if(children.size()>=1) return children[0]->terminal->string; return UNDEFINED; }
+    const std::string& getName() { if(children.size()>=2) return children[1]->terminal->string; return UNDEFINED; }
+    Node* getBody() { if(children.size()>=3) return children[2]; return NULL; }
 };
 
 class LogicalOpNode : public Node {

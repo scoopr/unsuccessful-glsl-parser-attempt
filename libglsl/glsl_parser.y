@@ -1,7 +1,7 @@
 %token_type {Token*}
 
 %default_type { Node* }
-
+%token_destructor { delete $$; }
 %token_prefix GLSL_
 %name glslparser
 
