@@ -248,18 +248,18 @@ function_header(A) ::= fully_specified_type(B) IDENTIFIER(C) LEFT_PAREN. { A = s
 //function_header(A) ::= fully_specified_type(B) IDENTIFIER(C) LEFT_PAREN. { A = s(NODE_FUNCTIONDECLARATION, B,state->identifier(C)); }
 
 
-parameter_declarator(A) ::= type_specifier(B) IDENTIFIER(C). { A = s(NODE_NOTIMPLEMENTED, B, state->identifier(C)); }
-parameter_declarator(A) ::= type_specifier(B) IDENTIFIER(C) LEFT_BRACKET constant_expression(D) RIGHT_BRACKET. { A = s(NODE_NOTIMPLEMENTED, B, state->identifier(C), D); }
+parameter_declarator(A) ::= type_specifier(B) IDENTIFIER(C). { A = s(NODE_PARAMETERDECLARATION, B, state->identifier(C)); }
+parameter_declarator(A) ::= type_specifier(B) IDENTIFIER(C) LEFT_BRACKET constant_expression(D) RIGHT_BRACKET. { A = s(NODE_PARAMETERDECLARATION, B, state->identifier(C), D); }
 
-parameter_declaration(A) ::= parameter_type_qualifier(B) parameter_qualifier(C) parameter_declarator(D). { A = s(NODE_PARAMETERDECLARATION, B,C,D); }
-parameter_declaration(A) ::= parameter_qualifier(B) parameter_declarator(C) . { A = s(NODE_PARAMETERDECLARATION, B,C); }
-parameter_declaration(A) ::= parameter_type_qualifier(B) parameter_qualifier(C) parameter_type_specifier(D) . { A = s(NODE_PARAMETERDECLARATION, B,C,D); }
-parameter_declaration(A) ::= parameter_qualifier(B) parameter_type_specifier(C) . { A = s(NODE_PARAMETERDECLARATION, B,C); }
+parameter_declaration(A) ::= parameter_type_qualifier(B) parameter_qualifier(C) parameter_declarator(D). { A = D; A->addChild(B); A->addChild(C); }
+parameter_declaration(A) ::= parameter_qualifier(B) parameter_declarator(C) . { A = C; A->addChild(B); }
+parameter_declaration(A) ::= parameter_type_qualifier(B) parameter_qualifier(C) parameter_type_specifier(D) . { A = s(NODE_PARAMETERDECLARATION, D, state->identifier(token("")), B,C); }
+parameter_declaration(A) ::= parameter_qualifier(B) parameter_type_specifier(C) . { A = s(NODE_PARAMETERDECLARATION, C, state->identifier(token("")), B); }
 
-parameter_qualifier(A) ::=. { A = s(NODE_NOTIMPLEMENTED); }
-parameter_qualifier(A) ::= IN(B) . { A = s(NODE_NOTIMPLEMENTED, B); }
-parameter_qualifier(A) ::= OUT(B) . { A = s(NODE_NOTIMPLEMENTED, B); }
-parameter_qualifier(A) ::= INOUT(B) . { A = s(NODE_NOTIMPLEMENTED, B); }
+parameter_qualifier(A) ::=. { A = state->identifier(token("")); /* TODO: constant token for null qualifier? */ }
+parameter_qualifier(A) ::= IN(B) . { A = state->identifier(B); }
+parameter_qualifier(A) ::= OUT(B) . { A = state->identifier(B); }
+parameter_qualifier(A) ::= INOUT(B) . { A = state->identifier(B); }
 
 
 parameter_type_specifier(A) ::= type_specifier(B) . { A = B; }
