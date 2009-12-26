@@ -36,9 +36,15 @@ static void should_equal_ast_(specific::SpecBase *sb, const char* str, Node *cn,
 
 static void should_equal_function_ast_(specific::SpecBase *sb, const char* str, Node *cn, const char *file, int line) {
 
-    Node *cnn = s(NODE_FUNCTIONDECLARATION,
-      s(NODE_TYPE, token("void")),
-      s(NODE_IDENTIFIER, token("f")), s(NODE_ANY,cn) ) ;
+    Node *cnn = s(NODE_TRANSLATIONUNIT,
+                 s(NODE_FUNCTIONDECLARATION,
+                   s(NODE_FUNCTIONHEADER,
+                     s(NODE_TYPE, token("void")),
+                     s(NODE_IDENTIFIER, token("f"))
+                    ),
+                   s(NODE_ANY, cn)
+                  )
+                 );
 
     std::string fn = std::string("void f() {") + str + "}";
     should_equal_ast_(sb, fn.c_str(), cnn, file, line);

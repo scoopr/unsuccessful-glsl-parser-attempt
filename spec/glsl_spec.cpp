@@ -40,11 +40,15 @@ describe(glsl_ast, "nodes") {
 describe(glsl, "function") {
     
     it("should parse empty function") {
-        should_equal_ast("void f(){}", 
-                         s(NODE_FUNCTIONDECLARATION,
-                           s(NODE_TYPE, token("void")),
-                           s(NODE_IDENTIFIER, token("f")), 
-                           any_tree() 
+        should_equal_ast("void f(){}",
+                         s(NODE_TRANSLATIONUNIT,
+                           s(NODE_FUNCTIONDECLARATION,
+                             s(NODE_FUNCTIONHEADER,
+                               s(NODE_TYPE, token("void")),
+                               s(NODE_IDENTIFIER, token("f"))
+                              ),
+                             any_tree() 
+                            )
                           )
                         );
     }

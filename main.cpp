@@ -73,16 +73,16 @@ public:
     std::ostream& os;
     CodeDumper(std::ostream& os_) : os(os_) {} 
     void visit(Node* n) {
-        if(!n) { std::cout << "Warning: NULL!" << std::endl; return; }
+        if(!n) { std::cerr << "Warning: NULL!" << std::endl; return; }
         FunctionDeclarationNode* fn = node_cast<FunctionDeclarationNode>(n);
         
         if(fn) {
             os << fn->getReturnType() << " " << fn->getName() << "()";
             os << "{";
-            if(fn->getBody()) {
+/*            if(fn->getBody()) {
                 fn->getBody()->traverse(*this);
-            } else { std::cout << "Warning: NULL FunctionDeclarationNode" << std::endl; }
-            os << "}";
+            } else { std::cerr << "Warning: NULL FunctionDeclarationNode" << std::endl; }
+            os << "}";*/
         } else {
 
 

@@ -236,16 +236,16 @@ declaration ::= PRECISION precision_qualifier type_specifier_no_prec SEMICOLON .
 declaration ::= type_qualifier IDENTIFIER LEFT_BRACE struct_declaration_list RIGHT_BRACE SEMICOLON .
 declaration ::= type_qualifier SEMICOLON .
 
-function_prototype(A) ::= function_declarator(B) RIGHT_PAREN. { A = B; }
+function_prototype(A) ::= function_declarator(B) RIGHT_PAREN. { A = s(NODE_FUNCTIONDECLARATION, B); }
 
 function_declarator(A) ::= function_header(B) . { A = B; }
 function_declarator(A) ::= function_header_with_parameters(B) . { A = B; }
 
-function_header_with_parameters(A) ::= function_header(B) parameter_declaration(C). { A = s(NODE_NOTIMPLEMENTED, B,C); }
+function_header_with_parameters(A) ::= function_header(B) parameter_declaration(C). { A = B; B->addChild(C); }
 function_header_with_parameters(A) ::= function_header_with_parameters(B) COMMA parameter_declaration(C). { A = B; B->addChild(C); }
 
-//function_header(A) ::= fully_specified_type(B) IDENTIFIER(C) LEFT_PAREN. { A = s(NODE_NOTIMPLEMENTED, B,C); }
-function_header(A) ::= fully_specified_type(B) IDENTIFIER(C) LEFT_PAREN. { A = s(NODE_FUNCTIONDECLARATION, B,state->identifier(C)); }
+function_header(A) ::= fully_specified_type(B) IDENTIFIER(C) LEFT_PAREN. { A = s(NODE_FUNCTIONHEADER, B, state->identifier(C)); }
+//function_header(A) ::= fully_specified_type(B) IDENTIFIER(C) LEFT_PAREN. { A = s(NODE_FUNCTIONDECLARATION, B,state->identifier(C)); }
 
 
 parameter_declarator(A) ::= type_specifier(B) IDENTIFIER(C). { A = s(NODE_NOTIMPLEMENTED, B, state->identifier(C)); }
@@ -516,8 +516,8 @@ jump_statement(A) ::= DISCARD(B) SEMICOLON .  { A = s(NODE_NOTIMPLEMENTED, B); }
 
 
 
-translation_unit(A) ::= external_declaration(B). { A = B; }
-translation_unit(A) ::= translation_unit(B) external_declaration(C). { A =  s(NODE_NOTIMPLEMENTED, B); A->addChild(C); }
+translation_unit(A) ::= external_declaration(B). { A = s(NODE_TRANSLATIONUNIT, B); }
+translation_unit(A) ::= translation_unit(B) external_declaration(C). { A = B;  A->addChild(C); }
 
 
 external_declaration(A) ::= function_definition(B). { A = B; }

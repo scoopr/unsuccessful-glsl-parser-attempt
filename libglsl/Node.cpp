@@ -21,6 +21,8 @@ NodeType NODE_FUNCTIONDECLARATION = "NODE_FUNCTIONDECLARATION";
 NodeType NODE_LOGICALOP = "NODE_LOGICALOP";
 NodeType NODE_EQUALITYOP = "NODE_EQUALITYOP";
 NodeType NODE_ITERATION = "NODE_ITERATION";
+NodeType NODE_TRANSLATIONUNIT = "NODE_TRANSLATIONUNIT";
+NodeType NODE_FUNCTIONHEADER = "NODE_FUNCTIONHEADER";
 
 
 Node* createNode(NodeType type) {
@@ -43,6 +45,8 @@ Node* createNode(NodeType type) {
     else if(type == NODE_LOGICALOP) return new LogicalOpNode;
     else if(type == NODE_EQUALITYOP) return new EqualityOpNode;
     else if(type == NODE_ITERATION) return new IterationNode;
+    else if(type == NODE_TRANSLATIONUNIT) return new TranslationUnitNode;
+    else if(type == NODE_FUNCTIONHEADER) return new FunctionHeaderNode;
     return NULL;
 }
 
