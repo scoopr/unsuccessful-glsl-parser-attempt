@@ -230,7 +230,7 @@ expression(A) ::= expression(B) COMMA assignment_expression(C). { A = B; B->addC
 
 constant_expression(A) ::= conditional_expression(B). { A = B; }
 
-declaration(A) ::= function_prototype(B) SEMICOLON. { A = B; }
+declaration(A) ::= function_prototype(B) SEMICOLON. { A = B; /*B->addChild(s(NODE_SCOPE));*/ /* TODO: or return only the header? */ }
 declaration(A) ::= init_declarator_list(B) SEMICOLON .{ A = B; }
 declaration ::= PRECISION precision_qualifier type_specifier_no_prec SEMICOLON .
 declaration ::= type_qualifier IDENTIFIER LEFT_BRACE struct_declaration_list RIGHT_BRACE SEMICOLON .
@@ -444,7 +444,7 @@ simple_statement(A) ::= jump_statement(B) . { A = B; }
 
 
 
-compound_statement(A) ::= LEFT_BRACE RIGHT_BRACE . { A = s(NODE_NOTIMPLEMENTED); }
+compound_statement(A) ::= LEFT_BRACE RIGHT_BRACE . { A = s(NODE_SCOPE); }
 compound_statement(A) ::= LEFT_BRACE statement_list(B) RIGHT_BRACE . { A = B; }
 
 
@@ -452,11 +452,11 @@ statement_no_new_scope(A) ::= compound_statement_no_new_scope(B) . { A = B; }
 statement_no_new_scope(A) ::= simple_statement(B) . { A = B; }
 
 
-compound_statement_no_new_scope(A) ::= LEFT_BRACE RIGHT_BRACE. { A = s(NODE_NOTIMPLEMENTED); }
+compound_statement_no_new_scope(A) ::= LEFT_BRACE RIGHT_BRACE. { A = s(NODE_SCOPE); }
 compound_statement_no_new_scope(A) ::= LEFT_BRACE statement_list(B) RIGHT_BRACE. { A = B; }
 
 
-statement_list(A) ::= statement(B).  { A = s(NODE_NOTIMPLEMENTED, B); }
+statement_list(A) ::= statement(B).  { A = s(NODE_SCOPE, B); }
 statement_list(A) ::= statement_list(B) statement(C). { A = B; if(B) B->addChild(C); } 
 
 

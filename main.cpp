@@ -77,12 +77,16 @@ public:
         FunctionDeclarationNode* fn = node_cast<FunctionDeclarationNode>(n);
         
         if(fn) {
-            os << fn->getReturnType() << " " << fn->getName() << "()";
-            os << "{";
-/*            if(fn->getBody()) {
+            FunctionHeaderNode* header = node_cast<FunctionHeaderNode>(fn->getHeader());
+            os << header->getReturnType() << " " << header->getName() << "()";
+            if(fn->getBody()) {
+                os << "{";
                 fn->getBody()->traverse(*this);
-            } else { std::cerr << "Warning: NULL FunctionDeclarationNode" << std::endl; }
-            os << "}";*/
+                os << "}";
+                
+            } else {
+                os << ";";
+            }
         } else {
 
 

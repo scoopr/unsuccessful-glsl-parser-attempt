@@ -23,6 +23,7 @@ NodeType NODE_EQUALITYOP = "NODE_EQUALITYOP";
 NodeType NODE_ITERATION = "NODE_ITERATION";
 NodeType NODE_TRANSLATIONUNIT = "NODE_TRANSLATIONUNIT";
 NodeType NODE_FUNCTIONHEADER = "NODE_FUNCTIONHEADER";
+NodeType NODE_SCOPE = "NODE_SCOPE";
 
 
 Node* createNode(NodeType type) {
@@ -47,6 +48,7 @@ Node* createNode(NodeType type) {
     else if(type == NODE_ITERATION) return new IterationNode;
     else if(type == NODE_TRANSLATIONUNIT) return new TranslationUnitNode;
     else if(type == NODE_FUNCTIONHEADER) return new FunctionHeaderNode;
+    else if(type == NODE_SCOPE) return new ScopeNode;
     return NULL;
 }
 

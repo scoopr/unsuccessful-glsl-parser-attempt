@@ -31,6 +31,7 @@ extern NodeType NODE_EQUALITYOP;
 extern NodeType NODE_ITERATION;
 extern NodeType NODE_TRANSLATIONUNIT;
 extern NodeType NODE_FUNCTIONHEADER;
+extern NodeType NODE_SCOPE;
 
 
 const std::string UNDEFINED="<undefined>";
@@ -266,11 +267,10 @@ class FunctionDeclarationNode : public Node {
 public:
     // FunctionDeclarationNode(Node* n1, Node *n2) : Node(n1,n2) {  }
     NodeType getNodeType() const { return  NODE_FUNCTIONDECLARATION ; }
-    const std::string& getReturnType() { /*if(children.size()>=1) return children[0]->terminal->string;*/ return UNDEFINED; }
-    const std::string& getName() { /*if(children.size()>=2) return children[1]->terminal->string;*/ return UNDEFINED; }
-//    Node* getBody() { if(children.size()>=3) return children[2]; return NULL; }
+    Node* getHeader() { if(children.size()>=1) return children[0]; return NULL; }
+    Node* getBody() { if(children.size()>=2) return children[1]; return NULL; }
     
-    bool isValid() { return getReturnType() != UNDEFINED && getName() != UNDEFINED /*&& getBody() != NULL*/; }
+    bool isValid() { return getHeader() != NULL; }
 };
 
 class LogicalOpNode : public Node {
@@ -300,8 +300,16 @@ public:
 class FunctionHeaderNode : public Node {
 public:
     NodeType getNodeType() const { return NODE_FUNCTIONHEADER; }
+    const std::string& getReturnType() const { if(children.size()>=1) return children[0]->terminal->string; return UNDEFINED; }
+    const std::string& getName() const { if(children.size()>=2) return children[1]->terminal->string; return UNDEFINED; }
+
+    bool isValid() { return getReturnType() != UNDEFINED && getName() != UNDEFINED; }
 };
 
+class ScopeNode : public Node {
+public:
+    NodeType getNodeType() const { return NODE_SCOPE; }    
+};
 
 Node* createNode(NodeType type);
 
