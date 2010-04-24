@@ -24,6 +24,8 @@ NodeType NODE_ITERATION = "NODE_ITERATION";
 NodeType NODE_TRANSLATIONUNIT = "NODE_TRANSLATIONUNIT";
 NodeType NODE_FUNCTIONHEADER = "NODE_FUNCTIONHEADER";
 NodeType NODE_SCOPE = "NODE_SCOPE";
+NodeType NODE_VARIABLEDECLARATION = "NODE_VARIABLEDECLARATION";
+NodeType NODE_VARIABLE = "NODE_VARIABLE";
 
 
 Node* createNode(NodeType type) {
@@ -49,7 +51,10 @@ Node* createNode(NodeType type) {
     else if(type == NODE_TRANSLATIONUNIT) return new TranslationUnitNode;
     else if(type == NODE_FUNCTIONHEADER) return new FunctionHeaderNode;
     else if(type == NODE_SCOPE) return new ScopeNode;
-    return NULL;
+    else if(type == NODE_VARIABLEDECLARATION) return new VariableDeclarationNode;
+    else if(type == NODE_VARIABLE) return new VariableNode;
+
+    return new NotImplementedNode;
 }
 
 

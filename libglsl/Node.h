@@ -32,7 +32,8 @@ extern NodeType NODE_ITERATION;
 extern NodeType NODE_TRANSLATIONUNIT;
 extern NodeType NODE_FUNCTIONHEADER;
 extern NodeType NODE_SCOPE;
-
+extern NodeType NODE_VARIABLEDECLARATION;
+extern NodeType NODE_VARIABLE;
 
 const std::string UNDEFINED="<undefined>";
 
@@ -310,6 +311,17 @@ class ScopeNode : public Node {
 public:
     NodeType getNodeType() const { return NODE_SCOPE; }    
 };
+
+class VariableDeclarationNode : public Node {
+public:
+    NodeType getNodeType() const { return NODE_VARIABLEDECLARATION; }
+};
+
+class VariableNode : public Node {
+public:
+    NodeType getNodeType() const { return NODE_VARIABLE; }
+};
+
 
 Node* createNode(NodeType type);
 

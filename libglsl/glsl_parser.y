@@ -267,42 +267,45 @@ parameter_type_specifier(A) ::= type_specifier(B) . { A = B; }
 
 
 init_declarator_list(A) ::= single_declaration(B) . { A = B; }
-init_declarator_list(A) ::= init_declarator_list(B) COMMA IDENTIFIER(C) . { A = B; B->addChild(state->identifier(C)); }
-init_declarator_list ::= init_declarator_list COMMA IDENTIFIER LEFT_BRACKET  RIGHT_BRACKET .
-init_declarator_list ::= init_declarator_list COMMA IDENTIFIER LEFT_BRACKET constant_expression RIGHT_BRACKET .
-init_declarator_list ::= init_declarator_list COMMA IDENTIFIER LEFT_BRACKET RIGHT_BRACKET EQUAL initializer .
-init_declarator_list ::= init_declarator_list COMMA IDENTIFIER LEFT_BRACKET constant_expression RIGHT_BRACKET EQUAL initializer .
-init_declarator_list(A) ::= init_declarator_list(B) COMMA IDENTIFIER(C) EQUAL initializer(D) . { A = B; Node* c = state->identifier(C); c->addChild(D); B->addChild(c); }
+init_declarator_list(A) ::= init_declarator_list(B) COMMA IDENTIFIER(C) . { A = B; B->addChild(s(NODE_VARIABLE,state->identifier(C))); }
+init_declarator_list(A) ::= init_declarator_list(B) COMMA IDENTIFIER(C) LEFT_BRACKET  RIGHT_BRACKET . { A = B; B->addChild( s(NODE_VARIABLE,state->identifier(C), s("todo: dyn-array")) ); }
+init_declarator_list(A) ::= init_declarator_list(B) COMMA IDENTIFIER(C) LEFT_BRACKET constant_expression(D) RIGHT_BRACKET . { A=B; B->addChild( s(NODE_VARIABLE, state->identifier(C), s("todo: array"),D)); }
+init_declarator_list(A) ::= init_declarator_list(B) COMMA IDENTIFIER(C) LEFT_BRACKET RIGHT_BRACKET EQUAL initializer(D) .{ A=B; B->addChild( s(NODE_VARIABLE, state->identifier(C), s("todo: array"),D)); }
+init_declarator_list(A) ::= init_declarator_list(B) COMMA IDENTIFIER(C) LEFT_BRACKET constant_expression(D) RIGHT_BRACKET EQUAL initializer(E) . { A=B; B->addChild( s(NODE_VARIABLE, state->identifier(C), s("todo: array"), D, E)); }
+init_declarator_list(A) ::= init_declarator_list(B) COMMA IDENTIFIER(C) EQUAL initializer(D) . { 
+    A = B; 
+    B->addChild(s(NODE_VARIABLE, C, D)); 
+}
 
 
 
 single_declaration(A) ::= fully_specified_type(B) . { A = B; }
-single_declaration(A) ::= fully_specified_type(B) IDENTIFIER(C) . { A = s(NODE_NOTIMPLEMENTED, B, state->identifier(C)); }
-single_declaration(A) ::= fully_specified_type(B) IDENTIFIER(C) LEFT_BRACKET  RIGHT_BRACKET . { A = s(NODE_NOTIMPLEMENTED, B, state->identifier(C)); }
-single_declaration(A) ::= fully_specified_type(B) IDENTIFIER(C) LEFT_BRACKET constant_expression(D) RIGHT_BRACKET . { A = s(NODE_NOTIMPLEMENTED, B, state->identifier(C), D); }
-single_declaration(A) ::= fully_specified_type(B) IDENTIFIER(C) LEFT_BRACKET RIGHT_BRACKET EQUAL initializer(D) . { A = s(NODE_NOTIMPLEMENTED, B, state->identifier(C) ,D); }
-single_declaration(A) ::= fully_specified_type(B) IDENTIFIER(C) LEFT_BRACKET constant_expression(D) RIGHT_BRACKET EQUAL initializer(E) . { A = s(NODE_NOTIMPLEMENTED, B, state->identifier(C), D ,E); }
-single_declaration(A) ::= fully_specified_type(B) IDENTIFIER(C) EQUAL initializer(D) . { A = s(NODE_NOTIMPLEMENTED, B, state->identifier(C),D); }
+single_declaration(A) ::= fully_specified_type(B) IDENTIFIER(C) . { A = s(NODE_VARIABLEDECLARATION, B, s(NODE_VARIABLE, state->identifier(C))); }
+single_declaration(A) ::= fully_specified_type(B) IDENTIFIER(C) LEFT_BRACKET  RIGHT_BRACKET . { A = s(NODE_VARIABLEDECLARATION, B, s(NODE_VARIABLE, state->identifier(C))); }
+single_declaration(A) ::= fully_specified_type(B) IDENTIFIER(C) LEFT_BRACKET constant_expression(D) RIGHT_BRACKET . { A = s(NODE_VARIABLEDECLARATION, B, s(NODE_VARIABLE, state->identifier(C), D)); }
+single_declaration(A) ::= fully_specified_type(B) IDENTIFIER(C) LEFT_BRACKET RIGHT_BRACKET EQUAL initializer(D) . { A = s(NODE_VARIABLEDECLARATION, B, s(NODE_VARIABLE, state->identifier(C) ,D)); }
+single_declaration(A) ::= fully_specified_type(B) IDENTIFIER(C) LEFT_BRACKET constant_expression(D) RIGHT_BRACKET EQUAL initializer(E) . { A = s(NODE_VARIABLEDECLARATION, B, s(NODE_VARIABLE, state->identifier(C), D ,E)); }
+single_declaration(A) ::= fully_specified_type(B) IDENTIFIER(C) EQUAL initializer(D) . { A = s(NODE_VARIABLEDECLARATION, B, s(NODE_VARIABLE, state->identifier(C),D)); }
 single_declaration ::= INVARIANT IDENTIFIER .  // Vertex only. 
 
 
 fully_specified_type(A) ::= type_specifier(B) . { A = B; }
-fully_specified_type(A) ::= type_qualifier(B) type_specifier(C) . { A = s(NODE_NOTIMPLEMENTED, B,C); }
+fully_specified_type(A) ::= type_qualifier(B) type_specifier(C) . { A = C; C->addChild(B); }
 
 
-invariant_qualifier ::= INVARIANT .
+invariant_qualifier(A) ::= INVARIANT(B) . { A = s(NODE_NOTIMPLEMENTED, B); }
 
-interpolation_qualifier ::= SMOOTH .
-interpolation_qualifier ::= FLAT. 
-interpolation_qualifier ::= NOPERSPECTIVE .
+interpolation_qualifier(A) ::= SMOOTH(B) . { A = s(NODE_NOTIMPLEMENTED, B); }
+interpolation_qualifier(A) ::= FLAT(B). { A = s(NODE_NOTIMPLEMENTED, B); }
+interpolation_qualifier(A) ::= NOPERSPECTIVE(B) . { A = s(NODE_NOTIMPLEMENTED, B); }
 
 
-layout_qualifier ::= LAYOUT LEFT_PAREN layout_list RIGHT_PAREN .
+layout_qualifier(A) ::= LAYOUT LEFT_PAREN layout_list RIGHT_PAREN . { A = s(NODE_NOTIMPLEMENTED); }
 layout_list ::= IDENTIFIER .
-layout_list ::= layout_list COMMA IDENTIFIER .
+layout_list ::= layout_list COMMA IDENTIFIER . 
 
 
-parameter_type_qualifier ::= CONST .
+parameter_type_qualifier(A) ::= CONST(B) . { A = s(NODE_NOTIMPLEMENTED, B); }
 
 
 
